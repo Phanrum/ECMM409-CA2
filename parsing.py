@@ -1,4 +1,5 @@
 from lark import Lark, Transformer, v_args
+import numpy as np
 
 # Define the grammar
 grammar = """
@@ -73,10 +74,10 @@ class DatasetTransformer(Transformer):
         return edge_type[::]
 
     def node_coord_section(self, *nodes):
-        return list(nodes)
+        return np.array(nodes)
 
     def items_section(self, *items):
-        return list(items)
+        return np.array(items)
 
     def node(self, *data):
         return Node(int(data[0]), int(data[1]), int(data[2]))
@@ -131,4 +132,16 @@ class Dataset:
                 f"edge_type:{self.edge_type}\n nodes:{self.nodes}\n items:{self.items}>")
 
     def new(file_content):
+        """
+        Function to return a Dataset for a given file
+
+        For example:
+        
+        NAME_OF_DATASET = Dataset.new(open("data/a280-n279.txt", 'r').read())
+
+        To access the underlying information, use the format NAME_OF_DATASET.FIELD
+        where FIELD is one of:
+        (name, knapsack_type, dimension, number_items, knapsack_capacity, 
+        min_speed, max_speed, renting_ratio, edge_type, nodes, items)
+        """
         return DatasetTransformer().transform(parser.parse(file_content))
