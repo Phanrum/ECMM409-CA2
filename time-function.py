@@ -1,45 +1,107 @@
 import numpy as np
 
 
-# The function is designed to compute the total travel time for the traveling thief problem.
-def calculate_time(distances, weights, profits, knapsack_capacity, vmax, vmin, tour):
+# Redefine the function to handle cases where the total weight exceeds the knapsack capacity
+def generate_weight_profit_velocity(vmax, vmin, weights, profits, curr_wt_of_kns, curr_pro_of_kns, Q):
     """
-    Calculate the total travel time of the thief based on the provided formula.
+    Generate the updated weight, profit, and velocity for the knapsack after picking items in a city.
+
+    The function attempts to select a random combination of items. If the total weight of these items
+    does not exceed the capacity of the knapsack (Q), it calculates the new velocity based on the 
+    updated weight and returns the updated weight, profit, and velocity. If the total weight exceeds 
+    the knapsack capacity, it will attempt to select another combination of items. This process is repeated 
+    until a valid combination is found or the number of attempts exceeds a threshold (1000 attempts), 
+    at which point the function returns None.
+
+    Returning None serves several purposes:
+    - It prevents the function from entering an infinite loop if it's impossible to find a valid combination
+      of items that doesn't exceed the knapsack's capacity.
+    - It maintains the integrity of the algorithm by ensuring that only valid item combinations are considered.
+    - It signals to the calling function that it was not possible to add more items without violating the
+      capacity constraint, allowing the calling function to handle this scenario appropriately (e.g., by skipping
+      the city or not picking up new items).
+    
+    Parameters:
+    - vmax (int): Maximum velocity of the thief.
+    - vmin (int): Minimum velocity of the thief.
+    - weights (list of int): Array of weights of the items in the current city.
+    - profits (list of int): Array of profits of the items in the current city.
+    - curr_wt_of_kns (int): Current weight of the knapsack.
+    - curr_pro_of_kns (int): Current profit of the knapsack.
+    - Q (int): Maximum capacity of the knapsack.
+
+    Returns:
+    - (tuple): Updated weight, profit, and velocity if the knapsack is not overloaded; otherwise, None.
+    """
+    # Initialization of the attempt count to ensure the function does not enter an infinite loop
+    attempts = 0
+    while True:
+        # Start with the current weight and profit before picking new items
+        w = curr_wt_of_kns
+        p = curr_pro_of_kns
+        # Randomly decide whether to pick each item or not
+        z = np.random.choice([0, 1], size=len(weights))
+        # Calculate the new weight and profit based on the items picked
+        for pos in range(len(weights)):
+            w += (weights[pos] * z[pos])  # Add the weight of picked items
+            p += (profits[pos] * z[pos])  # Add the profit of picked items
+        # Check if the total weight is within the knapsack's capacity
+        if w <= Q:
+            v = vmax - (w / Q * (vmax - vmin))  # Calculate the velocity based on the weight
+            return w, p, v
+        # Increment the attempt count and if it exceeds a threshold, return None to indicate failure
+        attempts += 1
+        if attempts > 1000:
+            # After 1000 attempts, if no valid selection is found, return None to avoid infinite loop and indicate failure
+            return None
+
+
+def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits, Q):
+    """
+    Calculate the total travel time and profit for a given route of cities.
+
+    Parameters:
+    - cities (list of int): List of city indices to visit in order.
+    - distance_matrix (2D list of int): Matrix of distances between cities.
+    - vmax (int): Maximum velocity of the thief.
+    - vmin (int): Minimum velocity of the thief.
+    - weights (list of lists of int): List of arrays containing weights of items in each city.
+    - profits (list of lists of int): List of arrays containing profits of items in each city.
+    - Q (int): Maximum capacity of the knapsack.
+
+    Returns:
+    - (tuple): Total travel time and total profit for the route.
     """
     
-    # Initialize the total travel time to zero. This variable will accumulate the travel time over the entire tour.
+    # Initialize total travel time and profit variables
     total_time = 0
+    total_profit = 0
     
-    # Initialize the current weight and profit of the knapsack to zero.
-    # These will be updated as the thief picks items from each city.
-    curr_wt_of_kns = 0  # Current weight of the knapsack.
-    curr_pro_of_kns = 0  # Current profit of the knapsack.
+    # Initialize the current state of the knapsack
+    curr_wt_of_kns = 0
+    curr_pro_of_kns = 0
+    
+    # Begin with the minimum velocity
+    velocity = vmin
 
-    # Iterate over the tour. The range function generates a sequence from 0 to the length of the tour minus one.
-    # This is because the last travel leg will be handled separately to close the loop of the tour.
-    for i in range(len(tour) - 1):
-        # Call 'generate_weight_profit_velocity' to determine which items to pick from the current city,
-        # and update the knapsack's weight, profit, and the thief's velocity accordingly.
-        curr_wt_of_kns, curr_pro_of_kns, velocity = generate_weight_profit_velocity(
-            vmax, vmin, weights[tour[i]], profits[tour[i]], curr_wt_of_kns, curr_pro_of_kns, knapsack_capacity)
+    # Loop through each city in the route
+    for i in range(len(cities) - 1):
+        # Calculate the updated knapsack state after visiting the current city
+        result = generate_weight_profit_velocity(vmax, vmin, weights[cities[i]], profits[cities[i]], curr_wt_of_kns, curr_pro_of_kns, Q)
         
-        # Calculate the time to travel from the current city to the next city in the tour.
-        # This is done by dividing the distance between the two cities by the thief's current velocity.
-        # distances[tour[i]][tour[i+1]] gets the distance from the distance matrix for the current leg of the journey.
-        time = distances[tour[i]][tour[i+1]] / velocity
+        # Update the current state if the knapsack is not overloaded
+        if result:
+            curr_wt_of_kns, curr_pro_of_kns, velocity = result
+        # If knapsack is overloaded, continue without updating
         
-        # Add the calculated time for the current leg to the total travel time.
-        total_time += time
+        # Calculate the time to travel to the next city based on the current velocity
+        time_to_next_city = distance_matrix[cities[i]][cities[i+1]] / velocity
+        total_time += time_to_next_city
+        total_profit += curr_pro_of_kns  # Assuming profit is cumulative
+        
+    # Calculate the time to return to the starting city and update the total time
+    time_to_start_city = distance_matrix[cities[-1]][cities[0]] / velocity
+    total_time += time_to_start_city
 
-    # After the loop, handle the travel from the last city back to the starting city.
-    # This requires one more update to the knapsack's weight, profit, and velocity.
-    curr_wt_of_kns, curr_pro_of_kns, velocity = generate_weight_profit_velocity(
-        vmax, vmin, weights[tour[-1]], profits[tour[-1]], curr_wt_of_kns, curr_pro_of_kns, knapsack_capacity)
-    
-    # Add the travel time for the final leg of the journey, from the last city back to the first.
-    # This is done by dividing the distance between the last and first cities by the velocity.
-    total_time += distances[tour[-1]][tour[0]] / velocity
-    
-    # The function returns the total travel time after calculating the time for each leg of the journey.
-    return total_time
+    return total_time, total_profit
 
