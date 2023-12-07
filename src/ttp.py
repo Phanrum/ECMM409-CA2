@@ -20,7 +20,7 @@ while(line.strip() != ''):
             a = line.split()
             city_cordinates[i][0] = float(a[1].strip())
             city_cordinates[i][1] = float(a[2].strip())
-        break;
+        break
     line=f.readline()
     
 for i in range(number_of_cities):
