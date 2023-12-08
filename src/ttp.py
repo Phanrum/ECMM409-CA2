@@ -3,15 +3,14 @@ import math
 def euclidean_distance(point1, point2):
     return math.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
 
-
-def make_distance_matrix(dataset):
+def make_distance_matrix(node_coord_section):
     """
     Creates a distance matrix between cities based on the euclidean distance between them.
 
     Parameters
     ----------
-    dataset : parsing.Dataset
-        Parsed data for the problem
+    node_coord_section : 2D numpy array
+        Array of cities and their coordinates
 
     Returns
     -------
@@ -21,11 +20,8 @@ def make_distance_matrix(dataset):
     """
 
     # preparing information from the dataset
-    number_of_cities = dataset.dimension
-    # getting coordinates
-    city_cordinates = np.zeros((number_of_cities, 2), dtype=np.float64)
-    city_cordinates[:, 0] = [dataset.nodes[i].x for i in range(number_of_cities)]
-    city_cordinates[:, 1] = [dataset.nodes[i].y for i in range(number_of_cities)]
+    number_of_cities = len(node_coord_section)
+    coords_only = node_coord_section[:,1:]
 
     # prepare the distance matrix
     dist_matrix = np.zeros((number_of_cities, number_of_cities), dtype=np.float64)
@@ -33,7 +29,7 @@ def make_distance_matrix(dataset):
     for i in range(number_of_cities):
         for j in range(number_of_cities):
             if(i!=j):
-                dist_matrix[i][j] = euclidean_distance(city_cordinates[i], city_cordinates[j])
+                dist_matrix[i][j] = euclidean_distance(coords_only[i], coords_only[j])
 
     return dist_matrix
     

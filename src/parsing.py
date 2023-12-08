@@ -145,3 +145,49 @@ class Dataset:
         min_speed, max_speed, renting_ratio, edge_type, nodes, items)
         """
         return DatasetTransformer().transform(parser.parse(file_content))
+
+def item_section(dataset):
+    """
+    Recreates the item section from the parsed data.
+
+    Parameters
+    ----------
+    dataset : parsing.Dataset
+        The parsed data.
+
+    Returns
+    -------
+    item_section : 2D numpy array
+        A table of items: index, profit, weight, node.
+    """
+
+    item_section = np.zeros((len(dataset.items), 4))
+    item_section[:, 0] = [dataset.items[i].index for i in range(dataset.number_items)]  # item indices
+    item_section[:, 1] = [dataset.items[i].profit for i in range(dataset.number_items)]  # item profits
+    item_section[:, 2] = [dataset.items[i].weight for i in range(dataset.number_items)]  # item weights
+    item_section[:, 3] = [dataset.items[i].node_number for i in
+                           range(dataset.number_items)]  # which city each item is in
+
+    return item_section
+
+def node_coord_section(dataset):
+    """
+    Recreates the node coord section of the dataset.
+
+    Parameters
+    ----------
+    dataset : parsing.Dataset
+        The parsed data.
+
+    Returns
+    -------
+    node_coord_section : 2D numpy array
+        A table of cities: index, x coordinate, y coordinate.
+
+    """
+    node_coord_section = np.zeros((dataset.dimension, 3), dtype=np.float64)
+    node_coord_section[:, 0] = [dataset.nodes[i].index for i in range(dataset.dimension)]
+    node_coord_section[:, 1] = [dataset.nodes[i].x for i in range(dataset.dimension)]
+    node_coord_section[:, 2] = [dataset.nodes[i].y for i in range(dataset.dimension)]
+
+    return node_coord_section

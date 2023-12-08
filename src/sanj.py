@@ -1,6 +1,6 @@
 import numpy as np
 
-def generate_weight_profit_velocity(vmax, vmin, weights, profit, curr_wt_of_kns, curr_pro_of_kns, Q):
+def generate_weight_profit_velocity_random(vmax, vmin, weights, profit, curr_wt_of_kns, curr_pro_of_kns, Q):
   """
   This function randomly selects the items to be picked for the knapsack
   and returns the final weight after the items are added
