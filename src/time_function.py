@@ -1,5 +1,6 @@
 import numpy as np
 
+from sanj import generate_weight_profit_velocity_random
 
 def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits, Q):
     """
@@ -31,7 +32,7 @@ def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits,
     # Iterate through each city in the route
     for i in range(len(cities) - 1):
         # Determine the weight, profit, and velocity for the current city
-        result = generate_weight_profit_velocity(vmax, vmin, weights[cities[i]], profits[cities[i]], curr_wt_of_kns, curr_pro_of_kns, Q)
+        result = generate_weight_profit_velocity_random(vmax, vmin, weights[cities[i]], profits[cities[i]], curr_wt_of_kns, curr_pro_of_kns, Q)
         # If a valid combination is found, update the knapsack and velocity
         if result:
             curr_wt_of_kns, curr_pro_of_kns, velocity = result

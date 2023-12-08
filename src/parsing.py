@@ -146,6 +146,7 @@ class Dataset:
         """
         return DatasetTransformer().transform(parser.parse(file_content))
 
+# tbh feel free to corrrect this, i tried accessing those sections from the parser and didn't succeed so this is maybe a temp fix'
 def item_section(dataset):
     """
     Recreates the item section from the parsed data.
