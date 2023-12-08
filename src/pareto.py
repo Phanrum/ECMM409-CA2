@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def pareto_parents(D, pop_size):
+def pareto_parents(D):
     """
     Plots the costs and times in a numpy array and then selects the Pareto fronts in green (max) and red (min).
 
@@ -88,6 +88,7 @@ def fast_non_dominated_sort(P):
     """
     Fast non-dom sorting approach proposed by Deb, K. et al in "A Fast and Elitist Multiobjective Genetic Algorithm:
 NSGA-II"
+    Pretty much from https://github.com/haris989/NSGA-II/blob/master/NSGA%20II.py
 
     Parameters
     ----------
@@ -96,66 +97,108 @@ NSGA-II"
 
     Returns
     -------
-    idk yet
+    front : list
+        A list of fronts? I'm not sure tbh
     """
 
+    time = P[:,0]
+    profit = P[:,1]
+
     # looks like we're basically assuming that nothing dominates each p
-    S = [[] for i in range(len(P))] # sets of solutions which each p will dominate
-    n = [0 for i in range(len(P))] # numbers of solutions which dominate each p
-    rank = [0 for i in range(len(P))] # assume everyone's rank is 0
+    S = [[] for i in range(len(time))] # sets of solutions which each p will dominate
+    n = [0 for i in range(len(time))] # numbers of solutions which dominate each p
+    rank = [0 for i in range(len(time))] # assume everyone's rank is 0
     front = [[]] # i'm guessing each list in this list will be a different front
 
-    for i, p in enumerate(P): # p is a solution
-        print("p:")
-        print(p)
-        print("i:")
-        print(i)
+    for p in range(len(time)):
+        # print("-"*30)
+        # print(f"p: {p}")
+        # print(P[p])
+        S[p] = [] # set of solutions that p dominates
+        n[p] = 0 # number of solutions which dominate p
 
-        S[i] = [] # set of solutions that p dominates
-        n[i] = 0 # number of solutions which dominate p
+        for q in range(len(time)):
+            if (time[p] < time[q] and profit[p] > profit[q]) or \
+                    (time[p] <= time[q] and profit[p] > profit[q]) or \
+                    (time[p] < time[q] and profit[p] >= profit[q]): # if p dominates q
+
+                if q not in S[p]: # if q is not yet in the set of solutions that p dominates
+                    S[p].append(q)
+
+            elif (time[q] < time[p] and profit[q] > profit[p]) or \
+                (time[q] <= time[p] and profit[q] > profit[p]) or \
+                (time[q] < time[p] and profit[q] >= profit[p]): # if q dominates p
+
+                n[p] += 1 # increase the count of solutions which dominate p, by 1
+
+        # print("number of sols which dominate p:")
+        # print(n[p])
+
+        if n[p] == 0: # if nothing dominates p
+            rank[p] = 0 # then it's got rank 0
+
+            # print("Congrats! This p is in the front.")
+
+            if p not in front[0]: # if this p is not in the front yet
+                front[0].append(p)
+
+    # now we've got the actual front, now we do subsequent fronts
+    i = 0
+    while (front[i] != []): # as long as something is in that front which is not an empty list
+        Q = [] # stores the members of the next front
+        for p in front[i]: # for solution in this front
+            for q in S[p]: # visit every solution that p dominates
+                n[q] -= 1 # decrease the number of sols that dominate it, by 1
+
+                if n[q] == 0: # if it's no longer dominated by anything
+                    rank[q] = i + 1 # then it's rank is the next one
+
+                    if q not in Q: # if q is not in the set yet
+                        Q.append(q)
+
+        i += 1 # going to the next i
+        front.append(Q) # putting this front in our collection
+
+        # del front[len(front) - 1] # ngl not sure what this is for
+    return front
 
 
-        for q in P: # compare p to every other solution
-            # print("    q:")
-            # print(f"    {q}")
-            if (p[0] < q[0] and p[1] < q[1]) or \
-                    (p[0] <= q[0] and p[1] < q[1]) or \
-                    (p[0] < q[0] and p[1] <= q[1]): # if p dominates q
+def plot_fronts(data, fronts):
+    """
+    Make a pot of pareto fronts
+    Parameters
+    ----------
+    data : 2D array
+        The data which will be plotted on the scatterplot
+    fronts : list [lists]
+        A list of fronts. Each list contains integers which correspond to indices of data points.
 
-                S[i].append(q) # append q to the list of sols dominated by p
-                # tu może być problem bo kod s gita ma tu indeksy a nie full q
+    Returns
+    -------
+    None
+    """
 
-            elif p[0] > q[0] and p[1] > q[1]: # if q dominates p
-                n[i] += 1 # increase the number of sols which dominate p
-                # print("np increased - p got dominated")
-        print(f"n[{i}]: {n[i]}")
-        if n[i] == 0: # if so, then p belongs to the first front
-            prank = 1
-            F[1].append(p)
-            print(f"congrats! the following p is in the first front:\n{p}")
-            print(F)
+    # plot the data
+    plt.scatter(data[:,0], data[:,1], marker='.', s=2)
 
-        print("-"*30)
+    # plot each front
+    for f in fronts:
+        # but sort them for plotting
+        nth_front = data[f]
+        nth_front = nth_front[nth_front[:, 0].argsort()]
 
+        plt.plot(nth_front[:,0], nth_front[:,1])
 
-    f = 1 # initialise the front counter
-    # while F[f]:
-    #     Q = 0 # stores the members of the next front
-    #
-    #     for i, p in enumerate(F[f]):
-    #         for q in S[i]: # i'm not sure i understand
-
-    return F
+    plt.show()
 
 
 
-
-
-# make a random array to test this on
-data = np.random.normal(3, 2.5, size=(60, 2))
-
-print(fast_non_dominated_sort(data))
-
-F = fast_non_dominated_sort(data)
-
-print(F)
+# # make a random array to test this on
+# data = np.random.normal(3, 2.5, size=(600, 2))
+#
+#
+# fronts = fast_non_dominated_sort(data)
+#
+# print(fronts)
+#
+# plot_fronts(data, fronts)
