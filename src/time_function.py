@@ -1,9 +1,7 @@
 import numpy as np
-from sanj import generate_weight_profit_velocity_random
+from sanj import generate_weight_profit_velocity
 
-from sanj import generate_weight_profit_velocity_random
-
-def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits, Q,renting_ratio):
+def calculate_travel_time(cities, distance_matrix, vmax, vmin, item_section, Q, renting_ratio):
     """
     Calculates the total travel time and net profit for a given route through cities, taking into account 
     the variation in velocity due to changes in the weight of the knapsack and the renting cost.
@@ -31,10 +29,17 @@ def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits,
     # Initialize the variables for total travel time, current knapsack weight, profit, and velocity
     total_time, curr_wt_of_kns, curr_pro_of_kns, velocity = 0, 0, 0, vmin
 
+    # construct weights and profits
+#TODO this will need a dictionary of cities and items
+    weights = None
+    profits = None
+#TODO change this once the dictionary is ready
+
+
     # Iterate through each city in the route
     for i in range(len(cities) - 1):
         # Determine the weight, profit, and velocity for the current city
-        result = generate_weight_profit_velocity_random(vmax, vmin, weights[cities[i]], profits[cities[i]], curr_wt_of_kns, curr_pro_of_kns, Q)
+        result = generate_weight_profit_velocity(vmax, vmin, weights[cities[i]], profits[cities[i]], curr_wt_of_kns, curr_pro_of_kns, Q)
         # If a valid combination is found, update the knapsack and velocity
         if result:
             curr_wt_of_kns, curr_pro_of_kns, velocity = result
