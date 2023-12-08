@@ -1,32 +1,5 @@
 import numpy as np
 
-def generate_weight_profit_velocity(vmax, vmin, weight, profits, curr_wt_of_kns, curr_pro_of_kns, Q):
-    # Attempt to find a valid combination of items
-    attempts, max_attempts = 0, 1000
-    while attempts < max_attempts:
-        w, p = curr_wt_of_kns, curr_pro_of_kns
-
-        if hasattr(weight, "__len__"):
-            z = np.random.choice([0, 1], size=len(weight))
-            for pos in range(len(weight)):
-                if w + weight[pos] * z[pos] <= Q:
-                    w += weight[pos] * z[pos]
-                    p += profits[pos] * z[pos]
-        else:
-            # Handle the case where weight is a scalar
-            z = np.random.choice([0, 1], size=1)
-            if w + weight * z <= Q:
-                w += weight * z
-                p += profits * z
-
-        if w <= Q:
-            v = vmax - (w / Q * (vmax - vmin))
-            return w, p, v
-
-        attempts += 1
-    return None
-
-
 
 def calculate_travel_time(cities, distance_matrix, vmax, vmin, weights, profits, Q):
     """
