@@ -1,5 +1,3 @@
-from io import StringIO
-import pandas as pd
 import numpy as np
 
 
@@ -17,10 +15,11 @@ def generate_cities_and_items_random(dataset, item_section):
 
   Returns
   -------
-  city_travel : np.array[int]
-    The order of cities to be visited
-  items_selected : np.array[int]
-    A binary array which decides which items are to be picked
+  cities_items_dict : dict{int: list of tuples (int, int)}
+    A dictionary containing the list of items to be picked in each of the city and their weights present,
+    and arranged in the order of cities to be visited
+  total_profit : int
+    The final profit of the knapsack which is the addition of all the profits of each of the items
 
   """
 
@@ -36,7 +35,6 @@ def generate_cities_and_items_random(dataset, item_section):
     weight_array = item_section[:,2]
     prob = Q / sum(weight_array)
 
-    ####
     not_a_good_list = True
     items_select = None # initiate a packing list
     while not_a_good_list:
@@ -44,4 +42,17 @@ def generate_cities_and_items_random(dataset, item_section):
         w = sum(weight_array * items_select)
         if w <= Q: not_a_good_list = False
         # the while loop keeps on generating the array z until the knapsack condition is not violated
-    return city_travel, items_select
+
+    cities_items_dict = {}
+    for city in city_travel:
+      for item in item_section:
+        if items_select[item-1] == 1 and item_section[item-1, 3] == city:
+          cities_items_dict[city].append((item, item_section[:, 2]))
+    total_profit = sum(items_select*item_section[:, 1])
+    return cities_items_dict, total_profit
+
+    '''
+    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
+                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
+                        city3_index: [(item1_index, item1_wt)...and so on...]}
+    '''
