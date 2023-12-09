@@ -191,10 +191,74 @@ def plot_fronts(data, fronts):
 
     plt.show()
 
+def crowding_distance_assignment(I):
+    """
+    The crowding-distance computation procedure of all solutions in a non-dominated set I.
+
+    Parameters
+    ----------
+    I : 2D array
+        An array of non-dominated solutions. In our case, the first column should contain time, and the second - profit.
+
+    Returns
+    -------
+    DistI : 1D array
+        Crowding distances for each solution
+    """
+
+    l = len(I) # number of solutions in I
+    DistI = np.zeros((l, 1)) # distances for each solution
+
+    for m in range(2): # for each objective
+        # print("="*30)
+        # print(f"objective: {I[:,m]}")
+        I = np.sort(I, axis=m) # sort by each objective - ie. sort by time first, then it'll sort by profit in the next loop
+        # print(f"sorted I: {I}")
+        DistI[0] = 99999999 # infinity, i guess
+        DistI[-1] = 99999999 # set infinite distance to boundary cases
+
+        for i in range(1, l-1): # for all other points
+            # print("-"*20)
+            # print(f"i: {i}")
+            # print(f"Dist[i]: {DistI[i]}")
+            # print(f"I[i+1,m]: {I[i+1,m]}")
+            # print(f"DistI[i] + (I[i+1,m] - I[i-1,m]): {DistI[i] + (I[i+1,m] - I[i-1,m])}")
+            # print(f"np.max(I, axis=m): {np.min(I[m])}")
+            DistI[i] = DistI[i] + (I[i+1,m] - I[i-1,m]) / (np.max(I[m]) - np.min(I[m]))
+            # where the denominator is composed of the max value of objective m and the min value of objective m
+            # also, we sum up the distances for each objective
+
+    return DistI
+
+def crowded_comparison_operator(rank_i, rank_j, dist_i, dist_j):
+    """
+    Determines whether the partial order of i is higher than j, ie. if i should be preferred over j.
+    But has an issue if the two are the same - attempts to be remedied in the paper i haven't understood yet.
+
+    Parameters
+    ----------
+    rank_i : int
+        The pareto front on which i is.
+    rank_j : int
+        The pareto front on which j is.
+    dist_i : float
+        The crowding distance of i.
+    dist_j : float
+        The crowding distance of j.
+
+    Returns
+    -------
+    bool
+        Whether i is preferred over j.
+    """
+
+    if rank_i < rank_j or ((rank_i == rank_j) and (dist_i > dist_j)):
+        return True
+    return False
 
 
 # # make a random array to test this on
-# data = np.random.normal(3, 2.5, size=(600, 2))
+data = np.random.normal(3, 2.5, size=(60, 2))
 #
 #
 # fronts = fast_non_dominated_sort(data)
@@ -202,3 +266,5 @@ def plot_fronts(data, fronts):
 # print(fronts)
 #
 # plot_fronts(data, fronts)
+
+print(crowded_comparison_operator(1, 1, 1.2, 1.2))
