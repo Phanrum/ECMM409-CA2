@@ -1,15 +1,16 @@
 # import our own modules
-import sys
-sys.path.append('../src')
+#import sys
+#sys.path.append('../src')
 
 from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random
 from time_function import calculate_travel_time
+import pareto
 
 
 # read data
-dataset = Dataset.new(open("../data/a280-n279.txt", 'r').read())
+dataset = Dataset.new(open("data/a280-n279.txt", 'r').read())
 print(dataset.name)
 
 # basic info
@@ -28,8 +29,18 @@ distance_matrix = make_distance_matrix(node_coord_section)
 # generate solutions
 pop_size = 100
 
-travel_plan, packing_plan = [generate_cities_and_items_random(dataset, item_section) for i in range(pop_size)]
-parents = [[t, p] for t, p in zip(travel_plan, packing_plan)] # putting parents in one long list, where every item is a zip of each travel plan and packing plan
+travel_plan = []
+packing_plan = []
+
+for i in range(pop_size):
+    tp, pp = generate_cities_and_items_random(dataset, item_section)
+    travel_plan.append(tp)
+    packing_plan.append(pp)
+
+
+parents = list(zip(travel_plan, packing_plan))
+
+#parents = [[t, p] for t, p in zip(travel_plan, packing_plan)] # putting parents in one long list, where every item is a zip of each travel plan and packing plan
 assert len(parents) == pop_size, f"Wait, but the number of parents ({len(parents)}) is different to the population size ({pop_size})."
 # now we've made pop_size travel plans and packing plans
 
@@ -45,17 +56,17 @@ for parent in parents: # now sure yet whether it would be better to iterate over
     # evaluate a solution
     # total_time, net_profit = calculate_travel_time(travel_plan, distance_matrix)
     #TODO evaluation function is kind of still wip, relies on sanj's packing list func to be fixed
-    parent_fitnesses =
+    #parent_fitnesses =
 
 # once we have a population, perform crossovers and mutations to get the same number of children as parents
 #TODO crossovers and mutations - your time to shine lads
 
 children = parents # change this to actual children
-children_fitnesses =
+#children_fitnesses =
 
 # perform nsga-ii selection
 combined_pop = children + parents
-combined_fitnesses = children_fitnesses + parents_fitnesses
+#combined_fitnesses = children_fitnesses + parents_fitnesses
 # get their ranks
-fronts = fast_non_dominated_sort(combined_pop)
-plot_fronts(combined_pop, fronts)
+#fronts = pareto.fast_non_dominated_sort(combined_pop)
+#pareto.plot_fronts(combined_pop, fronts)
