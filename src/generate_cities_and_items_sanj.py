@@ -18,6 +18,14 @@ def generate_cities_and_items_random(dataset, item_section):
   cities_items_dict : dict{int: list of tuples (int, int)}
     A dictionary containing the list of items to be picked in each of the city and their weights present,
     and arranged in the order of cities to be visited
+
+    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
+                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
+                        city3_index: [(item1_index, item1_wt)...and so on...]}
+
+  city_travel : list
+    The order in which cities should be visited
+
   total_profit : int
     The final profit of the knapsack which is the addition of all the profits of each of the items
 
@@ -50,10 +58,6 @@ def generate_cities_and_items_random(dataset, item_section):
         if items_select[int(item-1)] == 1 and item_section[int(item-1), 3] == city:
           cities_items_dict[city].append((item, item_section[int(item-1), 2]))
     total_profit = sum(items_select*item_section[:, 1])
-    return cities_items_dict, total_profit
+    return cities_items_dict, city_travel, total_profit
 
-    '''
-    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
-                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
-                        city3_index: [(item1_index, item1_wt)...and so on...]}
-    '''
+

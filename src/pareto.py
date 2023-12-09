@@ -10,6 +10,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
+
 def pareto_parents(D):
     """
     Plots the costs and times in a numpy array and then selects the Pareto fronts in green (max) and red (min).
@@ -32,19 +33,17 @@ def pareto_parents(D):
     # actually this is ok. if it's <pop size then we'll need to sort them somehow and pick out as many as pop says
 
     # first, plot all the coordinates
-    plt.scatter(D[:,0], D[:,1], marker='.', s=2)
+    plt.scatter(D[:, 0], D[:, 1], marker='.', s=2)
 
     # while len(current_parents) < pop_size:
-        # fill up the parents for evolution?
-        # I need to do some research here on how to do this
-        # I think i'll leave it in one function to find the pareto front of some data. and that's it.
-        # because we'll call it at the end
-        # meanwhile, another function will dissect layers of the front to get as many parents as we need
-
-
+    # fill up the parents for evolution?
+    # I need to do some research here on how to do this
+    # I think i'll leave it in one function to find the pareto front of some data. and that's it.
+    # because we'll call it at the end
+    # meanwhile, another function will dissect layers of the front to get as many parents as we need
 
     # initialise the Pareto front - initially, all items count as being on the front until proven otherwise
-    red_front = np.ones(len(D), dtype=bool) # this is for the lowest scores
+    red_front = np.ones(len(D), dtype=bool)  # this is for the lowest scores
 
     # loop through each item, which will be compared to all other items. here, we make a mask for the data points to pick out pareto fronts
     for i in range(len(D)):
@@ -52,10 +51,9 @@ def pareto_parents(D):
 
             # checking if it should be in the pareto front
             # if it's not been dominated by anyone, then it deserves to be in the front.
-            if D[i,0] > D[j,0] and D[i,1] < D[j,1]:
+            if D[i, 0] > D[j, 0] and D[i, 1] < D[j, 1]:
                 red_front[i] = False
                 break
-
 
     # here, we only have the vectors which are not dominated
     pareto_front = D[red_front]
@@ -66,7 +64,7 @@ def pareto_parents(D):
     logging.info(pareto_front)
 
     # plot the parrots
-    plt.plot(pareto_front[:,0], pareto_front[:,1], color="r", label="Min front")
+    plt.plot(pareto_front[:, 0], pareto_front[:, 1], color="r", label="Min front")
     plt.legend(fontsize=13)
     plt.xlabel("Time", fontsize=15)
     plt.ylabel("Profit", fontsize=15)
@@ -75,6 +73,7 @@ def pareto_parents(D):
     # assert len(pareto_front) <= pop_size, "Oh no! We have more parrots than we want to go through to be evolved. We'll have to pick out the sparser ones"
 
     return pareto_front
+
 
 def plot_pareto(stuff):
     """
@@ -110,63 +109,63 @@ NSGA-II"
         A list of fronts. Each item contains the indices of solutions belonging in each front.
     """
 
-    time = P[:,0]
-    profit = P[:,1]
+    time = P[:, 0]
+    profit = P[:, 1]
 
     # looks like we're basically assuming that nothing dominates each p
-    S = [[] for i in range(len(time))] # sets of solutions which each p will dominate
-    n = [0 for i in range(len(time))] # numbers of solutions which dominate each p
-    rank = [0 for i in range(len(time))] # assume everyone's rank is 0
-    front = [[]] # i'm guessing each list in this list will be a different front
+    S = [[] for i in range(len(time))]  # sets of solutions which each p will dominate
+    n = [0 for i in range(len(time))]  # numbers of solutions which dominate each p
+    rank = [0 for i in range(len(time))]  # assume everyone's rank is 0
+    front = [[]]  # i'm guessing each list in this list will be a different front
 
     for p in range(len(time)):
-        logging.info("-"*30)
+        logging.info("-" * 30)
         logging.info(f"p: {p}")
         logging.info(P[p])
-        S[p] = [] # set of solutions that p dominates
-        n[p] = 0 # number of solutions which dominate p
+        S[p] = []  # set of solutions that p dominates
+        n[p] = 0  # number of solutions which dominate p
 
         for q in range(len(time)):
             if (time[p] < time[q] and profit[p] > profit[q]) or \
                     (time[p] <= time[q] and profit[p] > profit[q]) or \
-                    (time[p] < time[q] and profit[p] >= profit[q]): # if p dominates q
+                    (time[p] < time[q] and profit[p] >= profit[q]):  # if p dominates q
 
-                if q not in S[p]: # if q is not yet in the set of solutions that p dominates
+                if q not in S[p]:  # if q is not yet in the set of solutions that p dominates
                     S[p].append(q)
 
             elif (time[q] < time[p] and profit[q] > profit[p]) or \
-                (time[q] <= time[p] and profit[q] > profit[p]) or \
-                (time[q] < time[p] and profit[q] >= profit[p]): # if q dominates p
+                    (time[q] <= time[p] and profit[q] > profit[p]) or \
+                    (time[q] < time[p] and profit[q] >= profit[p]):  # if q dominates p
 
-                n[p] += 1 # increase the count of solutions which dominate p, by 1
+                n[p] += 1  # increase the count of solutions which dominate p, by 1
 
         logging.info("number of sols which dominate p:")
         logging.info(n[p])
 
-        if n[p] == 0: # if nothing dominates p
-            rank[p] = 0 # then it's got rank 0
+        if n[p] == 0:  # if nothing dominates p
+            rank[p] = 0  # then it's got rank 0
 
             logging.info("Congrats! This p is in the front.")
 
-            if p not in front[0]: # if this p is not in the front yet
+            if p not in front[0]:  # if this p is not in the front yet
                 front[0].append(p)
 
     # now we've got the actual front, now we do subsequent fronts
     i = 0
-    while (front[i] != []): # as long as something is in that front which is not an empty list
-        Q = [] # stores the members of the next front
-        for p in front[i]: # for solution in this front
-            for q in S[p]: # visit every solution that p dominates
-                n[q] -= 1 # decrease the number of sols that dominate it, by 1
+    while (front[i] != []):  # as long as something is in that front which is not an empty list
+        Q = []  # stores the members of the next front
+        for p in front[i]:  # for solution in this front
+            for q in S[p]:  # visit every solution that p dominates
+                n[q] -= 1  # decrease the number of sols that dominate it, by 1
 
-                if n[q] == 0: # if it's no longer dominated by anything
-                    rank[q] = i + 1 # then it's rank is the next one
+                if n[q] == 0:  # if it's no longer dominated by anything
+                    rank[q] = i + 1  # then it's rank is the next one
 
-                    if q not in Q: # if q is not in the set yet
+                    if q not in Q:  # if q is not in the set yet
                         Q.append(q)
 
-        i += 1 # going to the next i
-        front.append(Q) # putting this front in our collection
+        i += 1  # going to the next i
+        front.append(Q)  # putting this front in our collection
 
     # ok now delete the last list because it has nothing in it
     del front[len(front) - 1]
@@ -190,7 +189,7 @@ def plot_fronts(data, fronts):
     """
 
     # plot the data
-    plt.scatter(data[:,0], data[:,1], marker='.', s=6)
+    plt.scatter(data[:, 0], data[:, 1], marker='.', s=6)
 
     # plot each front
     for f in fronts:
@@ -198,9 +197,10 @@ def plot_fronts(data, fronts):
         nth_front = data[f]
         nth_front = nth_front[nth_front[:, 0].argsort()]
 
-        plt.plot(nth_front[:,0], nth_front[:,1])
+        plt.plot(nth_front[:, 0], nth_front[:, 1])
 
     plt.show()
+
 
 def crowding_distance_assignment(I):
     """
@@ -217,20 +217,22 @@ def crowding_distance_assignment(I):
         Crowding distances for each solution
     """
 
-    l = len(I) # number of solutions in I
-    DistI = np.zeros((l, 1)) # distances for each solution
+    l = len(I)  # number of solutions in I
+    DistI = np.zeros((l, 1))  # distances for each solution
 
-    for m in range(2): # for each objective
-        I = np.sort(I, axis=m) # sort by each objective - ie. sort by time first, then it'll sort by profit in the next loop
-        DistI[0] = 99999999 # infinity, i guess
-        DistI[-1] = 99999999 # set infinite distance to boundary cases
+    for m in range(2):  # for each objective
+        I = np.sort(I,
+                    axis=m)  # sort by each objective - ie. sort by time first, then it'll sort by profit in the next loop
+        DistI[0] = 99999999  # infinity, i guess
+        DistI[-1] = 99999999  # set infinite distance to boundary cases
 
-        for i in range(1, l-1): # for all other points, calculate the distance
-            DistI[i] = DistI[i] + (I[i+1,m] - I[i-1,m]) / (np.max(I[m]) - np.min(I[m]))
+        for i in range(1, l - 1):  # for all other points, calculate the distance
+            DistI[i] = DistI[i] + (I[i + 1, m] - I[i - 1, m]) / (np.max(I[m]) - np.min(I[m]))
             # where the denominator is composed of the max value of objective m and the min value of objective m
             # also, we sum up the distances for each objective
 
     return DistI
+
 
 def crowded_comparison_operator(rank_i, rank_j, dist_i, dist_j):
     """
@@ -258,6 +260,7 @@ def crowded_comparison_operator(rank_i, rank_j, dist_i, dist_j):
         return True
     return False
 
+
 def calc_rank_and_crowding_distance(P, plot=False):
     """
     Takes a population of times and costs and appends two columns: front rank and crowding distance.
@@ -276,10 +279,10 @@ def calc_rank_and_crowding_distance(P, plot=False):
 
     """
 
-    data = np.zeros((len(P), 5)) # initiate
-    data[:,:2] = P # the first two columns filled with solutions (that is, their evaluations)
+    data = np.zeros((len(P), 5))  # initiate
+    data[:, :2] = P  # the first two columns filled with solutions (that is, their evaluations)
 
-    fronts = fast_non_dominated_sort(data[:,:2]) # calculate which front each solution belongs to
+    fronts = fast_non_dominated_sort(data[:, :2])  # calculate which front each solution belongs to
 
     # Now, for every solution, there has to be a rank column and a distance column
     for rank, f in enumerate(fronts):  # for every front
@@ -291,13 +294,13 @@ def calc_rank_and_crowding_distance(P, plot=False):
         data[f, 3] = crowding_distance_assignment(I)[:, 0]  # put the distances in the last column of data
 
     # adding an index would be very useful
-    data[:,-1] = list(range(len(P)))
+    data[:, -1] = list(range(len(P)))
 
     if plot:
         plot_fronts(P, fronts)
 
-
     return data, fronts
+
 
 def nsga_2_replacement_function(N, costs, fronts):
     """
@@ -350,7 +353,8 @@ def nsga_2_replacement_function(N, costs, fronts):
             logging.info(group_to_assess)
 
             # fill up solutions with enough of the assessed ones
-            solutions_to_carry.extend(group_to_assess[:space_left, -1].astype(int)) # the last column because that's where the indices are
+            solutions_to_carry.extend(
+                group_to_assess[:space_left, -1].astype(int))  # the last column because that's where the indices are
 
             logging.info("final solutions:")
             logging.info(solutions_to_carry)
@@ -358,24 +362,67 @@ def nsga_2_replacement_function(N, costs, fronts):
 
             break
 
-
     return solutions_to_carry
 
+def tour_select(tour_size, N, costs):
+    """
+    Runs a tournament of costs. Selects a winner based on front rank and then crowding distance.
 
+    Parameters
+    ----------
+    tour_size : int
+        The number of competing costs.
+    N : int
+        The size of the population.
+    costs : 2D numpy array
+        columns:
+        0 and 1: data (time, profit)
+        2: front rank
+        3: crowding distance
+        4: index
+
+    Returns
+    -------
+    winner : int
+        The index of the winning solution (taken from the last column)
+    """
+
+    lucky_numbers = np.random.randint(N, size=tour_size)
+    competitors = costs[lucky_numbers]
+    logging.info("lucky competitors!")
+    logging.info(competitors)
+
+    # now to choose the fittest. the fittest one will have the highest rank so only get those
+
+    best_rank = np.min(competitors[:, 2])  # if it's totally random, it should be more diverse. if it's down to a probability
+    # that's related to eg their rank, then it might converge to a local min. so we do it the random way for now.
+
+    logging.info(f"best rank: {best_rank}")
+    shortlist = competitors[np.where(competitors[:, 2] == best_rank)]
+    logging.info("shortlist:")
+    logging.info(shortlist)
+
+    # and now break ties between the shortlisted ones
+    winner = np.argmin(shortlist[:, 3])
+    logging.info(f"winning solution: {shortlist[winner][-1]}")
+
+    return int(shortlist[winner][-1])
 
 
 # # make a random array to test this on
-N = 500
+N = 250
 
-R = np.zeros((2*N, 2)) # initialise an array for children and parents
-R[:500] = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
-R[500:] = np.random.normal(3, 2.5, size=(N, 2)) # pretend these are children
+R = np.zeros((2 * N, 2))  # initialise an array for children and parents
+R[:N] = np.random.normal(3, 2.5, size=(N, 2))  # the first two columns are times and profits
+R[N:] = np.random.normal(3, 2.5, size=(N, 2))  # pretend these are children
 # sick. now the main loop.
 
 # assign ranks and distances
-costs, fronts = calc_rank_and_crowding_distance(R)#, plot=True)
-nsga_2_replacement_function(N, costs, fronts)
+costs, fronts = calc_rank_and_crowding_distance(R)  # , plot=True)
+solutions_to_carry = nsga_2_replacement_function(N, costs, fronts)
 
-
+# tournament selection!
+tour_size = 10
+# take random 10
 
 
