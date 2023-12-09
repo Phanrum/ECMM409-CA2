@@ -96,7 +96,7 @@ class Node:
         self.y = y_coord
 
     def __repr__(self):
-        return f"<index:{self.index},  x:{self.x}, y:{self.y}>"
+        return f"[index:{self.index},  x:{self.x}, y:{self.y}]"
 
 
 class Item:
@@ -107,7 +107,7 @@ class Item:
         self.node_number = node_number
 
     def __repr__(self):
-        return f"<index:{self.index}, profit:{self.profit}, weight:{self.weight}, node_number:{self.node_number}>"
+        return f"[index:{self.index}, profit:{self.profit}, weight:{self.weight}, node_number:{self.node_number}]"
 
 
 class Dataset:
@@ -126,10 +126,10 @@ class Dataset:
         self.items = items
 
     def __repr__(self):
-        return (f"<name:{self.name}\n knapsack_type:{self.knapsack_type}\n dimension:{self.dimension}\n "
+        return (f"[name:{self.name}\n knapsack_type:{self.knapsack_type}\n dimension:{self.dimension}\n "
                 f"number_items:{self.number_items}\n knapsack_capacity:{self.knapsack_capacity}\n "
                 f"min_speed:{self.min_speed}\n max_speed:{self.max_speed}\n renting_ratio:{self.renting_ratio}\n "
-                f"edge_type:{self.edge_type}\n nodes:{self.nodes}\n items:{self.items}>")
+                f"edge_type:{self.edge_type}\n nodes:{self.nodes}\n items:{self.items}]")
 
     def new(file_content):
         """
@@ -159,7 +159,7 @@ def item_section(dataset):
     Returns
     -------
     item_section : 2D numpy array
-        A table of items: index, profit, weight, node.
+        A table of items: index, profit, weight, node_number.
     """
 
     item_section = np.zeros((len(dataset.items), 4))
