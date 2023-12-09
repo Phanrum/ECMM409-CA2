@@ -1,14 +1,16 @@
 from parsing import node_coord_section
 from ttp import make_distance_matrix
 
-def calculate_total_time(dataset, vmax, vmin, cities_items_dict):
+def calculate_total_time(D, Q, vmax, vmin, cities_items_dict):
   """
   This function calculates and returns the total time taken to travel all the cities.
 
   Parameters
   ----------
-  dataset : parsing.Dataset
-    Parsed data.
+  D : 2D matrix
+    Distance matrix for distances between all cities.
+  Q : float
+    Knapsack capacity.
   vmax : int
     The maximum possible velocity.
   vmin : int
@@ -22,8 +24,7 @@ def calculate_total_time(dataset, vmax, vmin, cities_items_dict):
   time : int
     The total time taken to travel through all the cities.
   """
-  D = make_distance_matrix(node_coord_section(dataset))
-  Q = dataset.knapsack_capacity
+
   time = 0
   for city1, city2 in zip(list(cities_items_dict.keys())[:-1], list(cities_items_dict.keys())[1:]):
     weight = sum(wt for _, wt in cities_items_dict[city1])

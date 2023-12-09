@@ -23,7 +23,7 @@ def generate_cities_and_items_random(dataset, item_section):
                         city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
                         city3_index: [(item1_index, item1_wt)...and so on...]}
 
-  city_travel : list
+  city_travel : 1D numpy array
     The order in which cities should be visited
 
   total_profit : int
