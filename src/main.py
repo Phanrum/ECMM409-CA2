@@ -1,15 +1,16 @@
 # import our own modules
-import sys
-sys.path.append('../src')
+#import sys
+#sys.path.append('../src')
 
 from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random
 from time_function import calculate_travel_time
+import pareto
 
 
 # read data
-dataset = Dataset.new(open("../data/a280-n279.txt", 'r').read())
+dataset = Dataset.new(open("data/a280-n279.txt", 'r').read())
 print(dataset.name)
 
 # basic info
@@ -30,7 +31,9 @@ print((generate_cities_and_items_random(dataset, item_section))[0])# for i in ra
 # generate solutions
 pop_size = 100
 
+
 # parents = #something
+
 
 # assert len(parents) == pop_size, f"Wait, but the number of parents ({len(parents)}) is different to the population size ({pop_size})."
 # now we've made a parent population
@@ -49,4 +52,6 @@ pop_size = 100
 ## something
 ## new parent population comes out
 
+
 # repeat
+
