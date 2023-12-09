@@ -25,37 +25,28 @@ node_coord_section = node_coord_section(dataset)
 # construct a distance matrix
 distance_matrix = make_distance_matrix(node_coord_section)
 
+print((generate_cities_and_items_random(dataset, item_section))[0])# for i in range(pop_size)))
+
 # generate solutions
 pop_size = 100
 
-travel_plan, packing_plan = [generate_cities_and_items_random(dataset, item_section) for i in range(pop_size)]
-parents = [[t, p] for t, p in zip(travel_plan, packing_plan)] # putting parents in one long list, where every item is a zip of each travel plan and packing plan
-assert len(parents) == pop_size, f"Wait, but the number of parents ({len(parents)}) is different to the population size ({pop_size})."
-# now we've made pop_size travel plans and packing plans
+# parents = #something
 
-for parent in parents: # now sure yet whether it would be better to iterate over a big array or two lists but that can be optimised later
+# assert len(parents) == pop_size, f"Wait, but the number of parents ({len(parents)}) is different to the population size ({pop_size})."
+# now we've made a parent population
+
+# evaluate all parents
+
+# tournament selection
+
+# crossover
+
+# mutation
 
 
-    print("travel plan:")
-    print(parent[0])
-    print("-"*20)
-    print("packing plan:")
-    print(parent[1])
+# perform nsga-ii selection and replacement
+## combined_pop = children + parents
+## something
+## new parent population comes out
 
-    # evaluate a solution
-    # total_time, net_profit = calculate_travel_time(travel_plan, distance_matrix)
-    #TODO evaluation function is kind of still wip, relies on sanj's packing list func to be fixed
-    parent_fitnesses =
-
-# once we have a population, perform crossovers and mutations to get the same number of children as parents
-#TODO crossovers and mutations - your time to shine lads
-
-children = parents # change this to actual children
-children_fitnesses =
-
-# perform nsga-ii selection
-combined_pop = children + parents
-combined_fitnesses = children_fitnesses + parents_fitnesses
-# get their ranks
-fronts = fast_non_dominated_sort(combined_pop)
-plot_fronts(combined_pop, fronts)
+# repeat

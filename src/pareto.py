@@ -88,7 +88,7 @@ def fast_non_dominated_sort(P):
     """
     Fast non-dom sorting approach proposed by Deb, K. et al in "A Fast and Elitist Multiobjective Genetic Algorithm:
 NSGA-II"
-    Pretty much from https://github.com/haris989/NSGA-II/blob/master/NSGA%20II.py
+    Pretty much from https://github.com/haris989/NSGA-II/blob/master/NSGA%20II.py (comments mine)
 
     Parameters
     ----------
@@ -98,7 +98,7 @@ NSGA-II"
     Returns
     -------
     front : list
-        A list of fronts? I'm not sure tbh
+        A list of fronts. Each item contains the indices of solutions belonging in each front.
     """
 
     time = P[:,0]
@@ -159,7 +159,9 @@ NSGA-II"
         i += 1 # going to the next i
         front.append(Q) # putting this front in our collection
 
-        # del front[len(front) - 1] # ngl not sure what this is for
+    # ok now delete the last list because it has nothing in it
+    del front[len(front) - 1]
+
     return front
 
 
@@ -179,7 +181,7 @@ def plot_fronts(data, fronts):
     """
 
     # plot the data
-    plt.scatter(data[:,0], data[:,1], marker='.', s=2)
+    plt.scatter(data[:,0], data[:,1], marker='.', s=6)
 
     # plot each front
     for f in fronts:
@@ -210,20 +212,11 @@ def crowding_distance_assignment(I):
     DistI = np.zeros((l, 1)) # distances for each solution
 
     for m in range(2): # for each objective
-        # print("="*30)
-        # print(f"objective: {I[:,m]}")
         I = np.sort(I, axis=m) # sort by each objective - ie. sort by time first, then it'll sort by profit in the next loop
-        # print(f"sorted I: {I}")
         DistI[0] = 99999999 # infinity, i guess
         DistI[-1] = 99999999 # set infinite distance to boundary cases
 
-        for i in range(1, l-1): # for all other points
-            # print("-"*20)
-            # print(f"i: {i}")
-            # print(f"Dist[i]: {DistI[i]}")
-            # print(f"I[i+1,m]: {I[i+1,m]}")
-            # print(f"DistI[i] + (I[i+1,m] - I[i-1,m]): {DistI[i] + (I[i+1,m] - I[i-1,m])}")
-            # print(f"np.max(I, axis=m): {np.min(I[m])}")
+        for i in range(1, l-1): # for all other points, calculate the distance
             DistI[i] = DistI[i] + (I[i+1,m] - I[i-1,m]) / (np.max(I[m]) - np.min(I[m]))
             # where the denominator is composed of the max value of objective m and the min value of objective m
             # also, we sum up the distances for each objective
@@ -256,15 +249,52 @@ def crowded_comparison_operator(rank_i, rank_j, dist_i, dist_j):
         return True
     return False
 
+def calc_rank_and_crowding_distance(P, plot=False):
+    """
+    Takes a population of times and costs and appends two columns: front rank and crowding distance.
+
+    Parameters
+    ----------
+    P : 2D array
+        The first column should be times and the second column should be costs.
+    plot : bool (default: False)
+        Determine whether to visualise the pareto fronts.
+
+    Returns
+    -------
+    data : 2D array
+        Same as P, but has two extra columns: front rank and crowding distance.
+
+    """
+
+    data = np.zeros((len(P), 5)) # initiate
+    data[:,:2] = P # the first two columns filled with solutions (that is, their evaluations)
+
+    fronts = fast_non_dominated_sort(data[:,:2]) # calculate which front each solution belongs to
+
+    # Now, for every solution, there has to be a rank column and a distance column
+    for rank, f in enumerate(fronts):  # for every front
+        # put ranks in the rank column
+        for i in fronts[rank]:  # for every index in the front
+            data[i, 2] = rank
+        # put distances in the distances column
+        I = data[f, :2]  # get this rank's points
+        data[f, 3] = crowding_distance_assignment(I)[:, 0]  # put the distances in the last column of data
+
+    # adding an index would be very useful
+    data[:,-1] = list(range(len(P)))
+
+    if plot:
+        plot_fronts(P, fronts)
+
+
+    return data
 
 # # make a random array to test this on
-data = np.random.normal(3, 2.5, size=(60, 2))
-#
-#
-# fronts = fast_non_dominated_sort(data)
-#
-# print(fronts)
-#
-# plot_fronts(data, fronts)
+N = 500
+P = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
 
-print(crowded_comparison_operator(1, 1, 1.2, 1.2))
+data = calc_rank_and_crowding_distance(P)#, plot=True)
+print(data)
+
+# sick. now the main loop.
