@@ -1,3 +1,5 @@
+import numpy as np
+
 # import our own modules
 #import sys
 #sys.path.append('../src')
@@ -6,7 +8,7 @@ from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random
 from time_function import calculate_travel_time
-import pareto
+from pareto import calc_rank_and_crowding_distance, nsga_2_replacement_function
 
 
 # read data
@@ -40,18 +42,30 @@ pop_size = 100
 
 # evaluate all parents
 
+
+#### here is where the main loop starts
+
 # tournament selection
 
 # crossover
 
 # mutation
 
+# evaluate all parents
 
 # perform nsga-ii selection and replacement
-## combined_pop = children + parents
-## something
-## new parent population comes out
+# it expects a 2D numpy array "costs", where the first column has times and the second column has profits
 
+R = np.zeros((2*N, 2)) # initialise an array for children and parents
+
+# Replace the following two lines with actual parents and children
+R[:500] = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
+R[500:] = np.random.normal(3, 2.5, size=(N, 2)) # pretend these are children
+# sick. now the main loop.
+
+# assign ranks and distances
+costs, fronts = calc_rank_and_crowding_distance(R, plot=True)
+nsga_2_replacement_function(N, costs, fronts)
 
 # repeat
 

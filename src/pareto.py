@@ -1,6 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import logging
+
+# dev
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.WARNING,
+    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
+
 def pareto_parents(D):
     """
     Plots the costs and times in a numpy array and then selects the Pareto fronts in green (max) and red (min).
@@ -53,8 +62,8 @@ def pareto_parents(D):
     # but sort them
     pareto_front = pareto_front[pareto_front[:, 0].argsort()]
 
-    print("pareto front:")
-    print(pareto_front)
+    logging.info("pareto front:")
+    logging.info(pareto_front)
 
     # plot the parrots
     plt.plot(pareto_front[:,0], pareto_front[:,1], color="r", label="Min front")
@@ -111,9 +120,9 @@ NSGA-II"
     front = [[]] # i'm guessing each list in this list will be a different front
 
     for p in range(len(time)):
-        # print("-"*30)
-        # print(f"p: {p}")
-        # print(P[p])
+        logging.info("-"*30)
+        logging.info(f"p: {p}")
+        logging.info(P[p])
         S[p] = [] # set of solutions that p dominates
         n[p] = 0 # number of solutions which dominate p
 
@@ -131,13 +140,13 @@ NSGA-II"
 
                 n[p] += 1 # increase the count of solutions which dominate p, by 1
 
-        # print("number of sols which dominate p:")
-        # print(n[p])
+        logging.info("number of sols which dominate p:")
+        logging.info(n[p])
 
         if n[p] == 0: # if nothing dominates p
             rank[p] = 0 # then it's got rank 0
 
-            # print("Congrats! This p is in the front.")
+            logging.info("Congrats! This p is in the front.")
 
             if p not in front[0]: # if this p is not in the front yet
                 front[0].append(p)
@@ -256,7 +265,7 @@ def calc_rank_and_crowding_distance(P, plot=False):
     Parameters
     ----------
     P : 2D array
-        The first column should be times and the second column should be costs.
+        The first column should be times and the second column should be profits.
     plot : bool (default: False)
         Determine whether to visualise the pareto fronts.
 
@@ -288,13 +297,85 @@ def calc_rank_and_crowding_distance(P, plot=False):
         plot_fronts(P, fronts)
 
 
-    return data
+    return data, fronts
+
+def nsga_2_replacement_function(N, costs, fronts):
+    """
+    Performs NSGA-II to use front ranking and crowd distance sorting to pick out a new population in an elitist way.
+
+    Parameters
+    ----------
+    N : int
+        Population size.
+    costs : 2D numpy array
+        columns:
+        0 and 1: data (time, profit)
+        2: front rank
+        3: crowding distance
+        4: index
+    fronts : list[list[int]]
+        A list of fronts in ascending order. The output of fast_non_dominated_sort().
+
+    Returns
+    -------
+    solutions_to_carry : list[int]
+        A list of indices. These indices tell us which solutions to pick for the next population. Because solutions
+        should have the same indices as their cost evaluations.
+
+    """
+    # I don't know how to do it in a more efficient way but anyway
+    # P_new = np.zeros((N, 2)) # initialise the new population which will come out at the end
+
+    # maybe do it in a lazy way in the future but right now i just want something that will work
+    solutions_to_carry = []
+    i = -1
+    while len(solutions_to_carry) <= N:
+        i += 1
+
+        logging.info(f"i: {i}")
+        space_left = N - len(solutions_to_carry)
+        logging.info(f"space left: {space_left}")
+        logging.info(f"length of the front to add: {len(fronts[i])}")
+
+        if len(fronts[i]) <= space_left:
+            logging.info("solutions to carry extended")
+            solutions_to_carry.extend(fronts[i])
+            logging.info(f"length of current solutions to carry: {len(solutions_to_carry)}")
+        else:
+            # if you got to this point, that means there's a limited amount of space left
+            group_to_assess = costs[fronts[i]]
+            # sort by crowding distance
+            group_to_assess = group_to_assess[group_to_assess[:, 3].argsort()[::-1]]
+            logging.info("grop to assess:")
+            logging.info(group_to_assess)
+
+            # fill up solutions with enough of the assessed ones
+            solutions_to_carry.extend(group_to_assess[:space_left, -1].astype(int)) # the last column because that's where the indices are
+
+            logging.info("final solutions:")
+            logging.info(solutions_to_carry)
+            logging.info(f"length of solutions to carry: {len(solutions_to_carry)}")
+
+            break
+
+
+    return solutions_to_carry
+
+
+
 
 # # make a random array to test this on
 N = 500
-P = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
 
-data = calc_rank_and_crowding_distance(P)#, plot=True)
-print(data)
-
+R = np.zeros((2*N, 2)) # initialise an array for children and parents
+R[:500] = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
+R[500:] = np.random.normal(3, 2.5, size=(N, 2)) # pretend these are children
 # sick. now the main loop.
+
+# assign ranks and distances
+costs, fronts = calc_rank_and_crowding_distance(R)#, plot=True)
+nsga_2_replacement_function(N, costs, fronts)
+
+
+
+
