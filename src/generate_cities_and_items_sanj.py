@@ -46,7 +46,7 @@ def generate_cities_and_items_random(dataset, item_section):
     cities_items_dict = {}
     for city in city_travel:
       for item in item_section[:, 0]:
-        if items_select[item-1] == 1 and item_section[item-1, 3] == city:
+        if items_select[int(item-1)] == 1 and item_section[int(item-1), 3] == city:
           if city in cities_items_dict: cities_items_dict[city].append((item, item_section[item-1, 2]))
           else: cities_items_dict[city] = [(item, item_section[item-1, 2])]
     total_profit = sum(items_select*item_section[:, 1])
