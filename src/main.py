@@ -54,18 +54,21 @@ pop_size = 100
 # evaluate all parents
 
 # perform nsga-ii selection and replacement
-# it expects a 2D numpy array "costs", where the first column has times and the second column has profits
 
-R = np.zeros((2*N, 2)) # initialise an array for children and parents
+# it expects a 2D numpy array of costs "R", where the first column has times and the second column has profits
+R = np.zeros((2*pop_size, 2)) # initialise an array for children and parents
 
-# Replace the following two lines with actual parents and children
-R[:500] = np.random.normal(3, 2.5, size=(N, 2)) # the first two columns are times and profits
-R[500:] = np.random.normal(3, 2.5, size=(N, 2)) # pretend these are children
+# Replace the following two lines with the costs of actual parents and children
+R[:500] = np.random.normal(3, 2.5, size=(pop_size, 2)) # the first two columns are times and profits
+R[500:] = np.random.normal(3, 2.5, size=(pop_size, 2)) # pretend these are children
 # sick. now the main loop.
 
 # assign ranks and distances
-costs, fronts = calc_rank_and_crowding_distance(R, plot=True)
-nsga_2_replacement_function(N, costs, fronts)
+costs, fronts = calc_rank_and_crowding_distance(R, plot=True) # costs are basically R but updated
+# find the solutions which should be carried over
+idx = nsga_2_replacement_function(pop_size, costs, fronts)
+# now make a new population and put in it the solutions which idx tells you to
 
-# repeat
+
+# repeat until terminating condition
 
