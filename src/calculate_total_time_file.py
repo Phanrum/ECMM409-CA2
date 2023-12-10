@@ -30,4 +30,5 @@ def calculate_total_time(D, Q, vmax, vmin, cities_items_dict):
     weight = sum(wt for _, wt in cities_items_dict[city1])
     v = vmax-(weight/Q)*(vmax-vmin)
     time += D[city1, city2]/v
+  time += D[city_list[-1], city_list[0]]
   return time
