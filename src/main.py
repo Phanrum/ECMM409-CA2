@@ -1,5 +1,6 @@
 import numpy as np
 from tqdm import trange
+import logging
 
 # import our own modules
 import sys
@@ -7,10 +8,16 @@ sys.path.append('../src')
 
 from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
-from generate_cities_and_items_sanj import generate_cities_and_items_random
+from generate_cities_and_items_sanj import generate_cities_and_items_random, turn_binary_to_dictionary_and_calc_cost
 from calculate_total_time_file import calculate_total_time
 from pareto import calc_rank_and_crowding_distance, nsga_2_replacement_function, tour_select, plot_pareto
 
+# dev
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.DEBUG,
+    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 # read data
 dataset = Dataset.new(open("../data/a280-n279.txt", 'r').read())
@@ -31,14 +38,14 @@ node_coord_section = node_coord_section(dataset)
 distance_matrix = make_distance_matrix(node_coord_section)
 
 # # test solution
-cities_items_dict, city_travel, net_profit, total_time = generate_cities_and_items_random(dataset, item_section, distance_matrix, vmax, vmin, R)
-# print(calculate_total_time(distance_matrix, Q, vmax, vmin, cities_items_dict, city_travel))
+city_travel, items_select = generate_cities_and_items_random(dataset, item_section)
 
 # generate solutions
 N = 100 # population size
-population = [generate_cities_and_items_random(dataset, item_section, distance_matrix, vmax, vmin, R) for i in range(N)]
 
-print(population[0])
+population = [generate_cities_and_items_random(dataset, item_section) for i in range(N)]
+
+logging.info(population[0])
 
 assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
 
@@ -47,10 +54,10 @@ assert len(population) == N, f"Wait, but the number of parents ({len(population)
 # evaluate all parents
 
 fake_costs = np.zeros((N+2, 2)) # initialise an array for parents and children
-
-fake_costs[:N] = np.random.normal(3, 2.5, size=(N, 2)) # replace with actual costs of parents. First column is meant to be time, second is meant to be profits.
+fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in population]
 # to the evaluations, append front ranks and crowding distance
 fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True) # costs are basically costs but updated
+
 
 #### here is where the main loop starts
 # assume stopping criterion is number of iterations
@@ -61,59 +68,58 @@ for i in trange(iterations):
 
     # tournament selection
 
-    print("tournament selection")
-    print(f"We must choose solution number {tour_select(tour_size, N, fake_costs_extended)}.")
+    logging.debug("tournament selection")
+    logging.debug(f"We must choose solution number {tour_select(tour_size, N, fake_costs_extended)}.")
     winner1 = population[tour_select(tour_size, N, fake_costs_extended)]
-    print(f"The second winner is solution number {tour_select(tour_size, N, fake_costs_extended)}.")
+    logging.debug(f"The second winner is solution number {tour_select(tour_size, N, fake_costs_extended)}.")
     winner2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
     # crossover
 
     # mutation
 
+    # replace this with mutated individuals
     fake_children = [generate_cities_and_items_random(dataset, item_section) for i in range(2)]
-    # evaluate the children
-    fake_costs[N:] = np.random.normal(3, 2.5, size=(2, 2)) # replace with actual costs of the children
+    # evaluate the children by calling
+    fake_costs[N:] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in fake_children]
 
     ## perform nsga-ii selection and replacement
 
     # assign ranks and distances
-    costs, fronts = calc_rank_and_crowding_distance(fake_costs)#, plot=True) # costs are basically R but updated
+    fake_costs_extended, fronts = calc_rank_and_crowding_distance(fake_costs)#, plot=True)
     # find the solutions which should be carried over
-    idx = nsga_2_replacement_function(N, costs, fronts)
+    idx = nsga_2_replacement_function(N, fake_costs_extended, fronts)
     # now make a new population and put in it the solutions which idx tells you to
-    print("We should keep the following candidates from the combined pop:")
-    print(idx)
+    logging.debug("We should keep the following candidates from the combined pop:")
+    logging.debug(idx)
 
     # i don't think it's the most brilliant idea to concat lists of solutions.
-    # instead, i'll see what the largest 2 numbers are and if they are larger than N, they are the children.
-    # print(heapq.nlargest(2, idx))
-    # or just see if the children are in there
+    # instead, just see if the children are among recommended survivors
     child_idx = []
-    if 100 in idx:
+    if N in idx:
         child_idx.append(0)
-        idx.remove(100)
-    if 101 in idx:
+        idx.remove(N)
+    if N+1 in idx:
         child_idx.append(1)
-        idx.remove(101)
+        idx.remove((N+1))
 
     # new population
     population = [population[q] for q in idx] + [fake_children[q] for q in child_idx]
 
-    print(population)
-    print(f"len of new pop: {len(population)}")
-    print("Amazing! we've made a new population!")
-    print("="*50)
+    logging.debug(population)
+    logging.debug(f"len of new pop: {len(population)}")
+    logging.debug("Amazing! we've made a new population!")
+    logging.debug("="*50)
 
     # evaluate it
 
-    fake_costs = np.zeros((N + 2, 2))  # initialise an array for parents and children
-
-    fake_costs[:N] = np.random.normal(3, 2.5, size=(N, 2))  # replace with actual costs of parents. First column is meant to be time, second is meant to be profits.
+    # fake_costs = np.zeros((N + 2, 2))  # we could wipe the costs but it might be a waste of time
+    fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for
+                      c, i in population]
     # to the evaluations, append front ranks and crowding distance
-    fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])  # , plot=True) # costs are basically costs but updated
+    fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])  # , plot=True)
 
     # repeat until terminating condition
 
-print("the costs of this final population are:")
+logging.info("the costs of this final population are:")
 plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")

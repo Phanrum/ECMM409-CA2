@@ -2,7 +2,7 @@ import numpy as np
 
 from calculate_total_time_file import calculate_total_time
 
-def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
+def generate_cities_and_items_kami(dataset, item_section):
     """
   This function generates and returns a random order in which cities are to be traversed,
   along with a binary array that decides which items must be put in the knapsack
@@ -13,34 +13,15 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
     Parsed data.
   item_section : 2D numpy array
     A reconstruction of the item section from the parsed data.
-  D : 2D numpy array
-    Distance matrix calculated by make_distance_matrix().
-  vmax, vmin : floats
-    Max and min velocities of the thief.
-  R : float
-    Renting ratio.
 
   Returns
   -------
-  cities_items_dict : dict{int: list of tuples (int, int)}
-    A dictionary containing the list of items to be picked in each of the city and their weights present,
-    and arranged in the order of cities to be visited
-
-    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
-                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
-                        city3_index: [(item1_index, item1_wt)...and so on...]}
-
-  city_travel : 1D numpy array
+  city_travel : list[int]
     The order in which cities should be visited.
-  net_profit : float
-    The final profit of the knapsack which is the addition of all the profits of each of the items minus the rent.
-  total_time : float
-    The total time to travel.
-
+  items_select : 1D numpy array (binary)
+    A binary array of which items to take. Ordered the same way as it is in item_section.
   """
-    # Validate the input parameters
-    if vmax <= 0 or vmin <= 0 or vmax < vmin:
-        raise ValueError("Invalid velocities: vmax and vmin must be positive, and vmax must be greater than vmin.")
+
 
     # reading the required qualities
     Q = dataset.knapsack_capacity
@@ -62,22 +43,66 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
         if w <= Q: not_a_good_list = False
         # the while loop keeps on generating the array z until the knapsack condition is not violated
 
+    return city_travel, items_select
+
+def turn_binary_to_dictionary_and_calc_cost(city_travel, item_section, items_select, D, Q, vmax, vmin, R):
+    """
+    Turns the binary items selection array into a dictionary which matches up items with the cities they're packed at.
+    Description of the dictionary:
+    A dictionary containing the list of items to be picked in each of the city and their weights present,
+    and arranged in the order of cities to be visited
+
+    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
+                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
+                        city3_index: [(item1_index, item1_wt)...and so on...]}
+
+    Parameters
+    ----------
+    city_travel : list[int]
+        An ordered list of cities to visit.
+    item_section : 1D numpy array
+        A binary array of which items to take. Ordered the same way as it is in item_section.
+    D : 2D numpy array
+        Distance matrix.
+    Q : float
+        Maximum capacity of the knapsack.
+    vmax : float
+        Max velocity of the thief.
+    vmin : float
+        Min velocity of the thief.
+    R : float
+        Renting ratio.
+
+    Returns
+    -------
+    total_time : float
+        Time taken for the thief to travel.
+    net_profit : float
+        The profit after adding up item profits and subtracting rent.
+
+
+    """
+    # Validate the input parameters
+    if vmax <= 0 or vmin <= 0 or vmax < vmin:
+        raise ValueError("Invalid velocities: vmax and vmin must be positive, and vmax must be greater than vmin.")
+
+    # turn binary item array into a dict so that time can be calculated
     cities_items_dict = {}
     for city in city_travel:
       cities_items_dict[city] = []
-      for item in item_section[:, 0]:
-        if items_select[int(item-1)] == 1 and item_section[int(item-1), 3] == city:
+      for item in item_section[:,0]:
+        if items_select[int(item-1)] == 1 and item_section[int(item-1), 3] == city: # checks if the item has been selected and check if the item is present in the city
           cities_items_dict[city].append((item, item_section[int(item-1), 2]))
 
-    total_profit = sum(items_select*item_section[:, 1])
 
     # calculating costs
     # first, the time
     total_time = calculate_total_time(D, Q, vmax, vmin, cities_items_dict, city_travel)
 
     # now the net profit
-    net_profit = total_profit - (total_time * R)
+    items_profit = sum(items_select*item_section[:, 1])
+    net_profit = items_profit - (total_time * R)
 
-    return cities_items_dict, city_travel, net_profit, total_time
+    return total_time, net_profit
 
 
