@@ -5,7 +5,7 @@ from calculate_total_time_file import calculate_total_time
 def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
     """
   This function generates and returns a random order in which cities are to be traversed,
-  along with a binary array that decides which items must be put in the knapsack
+  along with a binary array that decides which items must be put in the knapsack.
 
   Parameters
   ----------
@@ -56,8 +56,8 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
 
 def get_packing_list_and_profit_time(dataset, item_section, D, vmax, vmin, R):
     """
-  This function generates and returns a random order in which cities are to be traversed,
-  along with a binary array that decides which items must be put in the knapsack
+  This function generates and returns a dictionary containing the cities and items present there,
+  along with the net profit obtained and the total time taken to traverse all the cities.
 
   Parameters
   ----------
