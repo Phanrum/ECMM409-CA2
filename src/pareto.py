@@ -75,17 +75,31 @@ def pareto_parents(D):
     return pareto_front
 
 
-def plot_pareto(stuff):
+def plot_pareto(costs, label):
     """
-    Placeholder for the code which plots pareto
+    Placeholder for the code which plots a pareto front
     Parameters
     ----------
-    stuff
+    costs : 2D numpy array
+        The first column will be plotted on the x axis, and the second on the y axis.
+    label : str The label displayed on the plot
 
     Returns
     -------
-
+    None
     """
+
+    # plot the parrots
+    costs = np.sort(costs, axis=0)
+
+    plt.plot(costs[:, 0], costs[:, 1], label=label)
+    plt.scatter(costs[:, 0], costs[:, 1], s=10, c="r")
+    plt.legend(fontsize=13)
+    plt.xlabel("Time", fontsize=15)
+    plt.ylabel("Profit", fontsize=15)
+    plt.title("Pareto front of TTF solutions", size=17)
+
+    plt.show()
 
 
 # ok basically
