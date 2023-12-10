@@ -22,20 +22,10 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
 
   Returns
   -------
-  cities_items_dict : dict{int: list of tuples (int, int)}
-    A dictionary containing the list of items to be picked in each of the city and their weights present,
-    and arranged in the order of cities to be visited
-
-    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
-                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
-                        city3_index: [(item1_index, item1_wt)...and so on...]}
-
   city_travel : 1D numpy array
     The order in which cities should be visited.
-  net_profit : float
-    The final profit of the knapsack which is the addition of all the profits of each of the items minus the rent.
-  total_time : float
-    The total time to travel.
+  items_select : 1D numpy array
+    A numpy array that decides which items are to be picked.
 
   """
     # Validate the input parameters
@@ -62,7 +52,46 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
         if w <= Q: not_a_good_list = False
         # the while loop keeps on generating the array z until the knapsack condition is not violated
 
+    return city_travel, items_select
+
+def get_packing_list_and_profit_time(dataset, item_section, D, vmax, vmin, R):
+    """
+  This function generates and returns a random order in which cities are to be traversed,
+  along with a binary array that decides which items must be put in the knapsack
+
+  Parameters
+  ----------
+  dataset : parsing.Dataset
+    Parsed data.
+  item_section : 2D numpy array
+    A reconstruction of the item section from the parsed data.
+  D : 2D numpy array
+    Distance matrix calculated by make_distance_matrix().
+  vmax, vmin : floats
+    Max and min velocities of the thief.
+  R : float
+    Renting ratio.
+
+  Returns
+  -------
+  cities_items_dict : dict{int: list of tuples (int, int)}
+    A dictionary containing the list of items to be picked in each of the city and their weights present,
+    and arranged in the order of cities to be visited
+
+    cities_items_dict = {city1_index: [(item1_index, item1_wt), (item2_index, item2_wt), (item3_index, item3_wt)],
+                        city2_index: [(item1_index, item1_wt), (item2_index, item2_wt)],
+                        city3_index: [(item1_index, item1_wt)...and so on...]}
+
+  net_profit : float
+    The final profit of the knapsack which is the addition of all the profits of each of the items minus the rent.
+  total_time : float
+    The total time to travel.
+
+  """
+
+    city_travel, items_select = generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R)
     cities_items_dict = {}
+    Q = dataset.knapsack_capacity
     for city in city_travel:
       cities_items_dict[city] = []
       for item in item_section[:, 0]:
@@ -78,6 +107,4 @@ def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
     # now the net profit
     net_profit = total_profit - (total_time * R)
 
-    return cities_items_dict, city_travel, net_profit, total_time
-
-
+    return cities_items_dict, net_profit, total_time
