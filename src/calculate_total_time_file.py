@@ -26,10 +26,12 @@ def calculate_total_time(D, Q, vmax, vmin, cities_items_dict):
   """
 
   city_list = list(cities_items_dict.keys())
-  time, v = 0, 0
+  time, weight, v = 0, 0, 0
   for city1, city2 in zip(city_list[:-1], city_list[1:]):
     weight = sum(wt for _, wt in cities_items_dict[city1])
     v = vmax-(weight/Q)*(vmax-vmin)
     time += (D[city1, city2]/v)
+  weight = sum(wt for _, wt in cities_items_dict[city_list[-1]])
+  v = vmax-(weight/Q)*(vmax-vmin)
   time += (D[city_list[-1], city_list[0]]/v)
   return time
