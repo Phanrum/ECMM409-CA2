@@ -29,6 +29,7 @@ vmin = dataset.min_speed
 vmax = dataset.max_speed
 Q = dataset.knapsack_capacity
 R = dataset.renting_ratio
+city_indices = [dataset.nodes[i].index for i in range(number_of_cities)]
 
 # sections (from data)
 item_section = item_section(dataset)
@@ -38,12 +39,12 @@ node_coord_section = node_coord_section(dataset)
 distance_matrix = make_distance_matrix(node_coord_section)
 
 # # test solution
-city_travel, items_select = generate_cities_and_items_random(dataset, item_section)
+city_travel, items_select = generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section)
 
 # generate solutions
 N = 100 # population size
 
-population = [generate_cities_and_items_random(dataset, item_section) for i in range(N)]
+population = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(N)]
 
 logging.info(population[0])
 
@@ -79,7 +80,7 @@ for i in trange(iterations):
     # mutation
 
     # replace this with mutated individuals
-    fake_children = [generate_cities_and_items_random(dataset, item_section) for i in range(2)]
+    fake_children = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(2)]
     # evaluate the children by calling
     fake_costs[N:] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in fake_children]
 

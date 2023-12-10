@@ -32,4 +32,42 @@ def make_distance_matrix(node_coord_section):
                 dist_matrix[i][j] = euclidean_distance(coords_only[i], coords_only[j])
 
     return dist_matrix
-    
+
+def packing_list_mutation(current_packing_list, item_section, Q):
+    """
+    Performs a bit flip mutation on the current packing list.
+
+    Parameters
+    ----------
+    current_packing_list : list[binary]
+        A binary list determining which items to pick up.
+    item_section : 2D numpy array
+        A reconstruction of the item section from the parsed data.
+    Q : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    mutated_list : list[binary]
+        A mutated packing list.
+    """
+
+    weight_array = item_section[:,2]
+    not_a_good_list = True
+    mutated_list = None  # initiate a packing list
+    while not_a_good_list:
+
+
+
+
+        ####### use current_packing_list to create a new mutated list
+        mutated_list = ########### this variable will contain your mutated packing list
+
+
+
+
+        w = sum(weight_array * mutated_list)
+        if w <= Q: not_a_good_list = False
+        # the while loop keeps on generating the array z until the knapsack condition is not violated
+
+    return mutated_list

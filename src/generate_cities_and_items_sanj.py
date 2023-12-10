@@ -2,31 +2,30 @@ import numpy as np
 
 from calculate_total_time_file import calculate_total_time
 
-def generate_cities_and_items_kami(dataset, item_section):
+def generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section):
     """
   This function generates and returns a random order in which cities are to be traversed,
-  along with a binary array that decides which items must be put in the knapsack
+  along with a binary array that decides which items must be put in the knapsack.
 
   Parameters
   ----------
-  dataset : parsing.Dataset
-    Parsed data.
+  Q : float
+    the capacity of the knapsack.
+  number_of_cities : int
+    The number of cities in the data.
+  city_indices : list[int]
+    A list of all cities.
   item_section : 2D numpy array
     A reconstruction of the item section from the parsed data.
 
   Returns
   -------
-  city_travel : list[int]
+  city_travel : 1D numpy array
     The order in which cities should be visited.
-  items_select : 1D numpy array (binary)
-    A binary array of which items to take. Ordered the same way as it is in item_section.
+  items_select : 1D numpy array
+    A numpy array that decides which items are to be picked.
+
   """
-
-
-    # reading the required qualities
-    Q = dataset.knapsack_capacity
-    number_of_cities = dataset.dimension
-    city_indices = [dataset.nodes[i].index for i in range(number_of_cities)]
 
     # create a list of cities to visit
     city_travel = np.random.choice(city_indices, size=number_of_cities, replace=False)
@@ -44,6 +43,7 @@ def generate_cities_and_items_kami(dataset, item_section):
         # the while loop keeps on generating the array z until the knapsack condition is not violated
 
     return city_travel, items_select
+
 
 def turn_binary_to_dictionary_and_calc_cost(city_travel, item_section, items_select, D, Q, vmax, vmin, R):
     """
@@ -88,6 +88,7 @@ def turn_binary_to_dictionary_and_calc_cost(city_travel, item_section, items_sel
 
     # turn binary item array into a dict so that time can be calculated
     cities_items_dict = {}
+
     for city in city_travel:
       cities_items_dict[city] = []
       for item in item_section[:,0]:
