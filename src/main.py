@@ -1,5 +1,6 @@
 import numpy as np
 import heapq
+from operator import itemgetter
 
 # import our own modules
 import sys
@@ -29,9 +30,9 @@ node_coord_section = node_coord_section(dataset)
 # construct a distance matrix
 distance_matrix = make_distance_matrix(node_coord_section)
 
-# test solution
-cities_items_dict = generate_cities_and_items_random(dataset, item_section)
-print(calculate_total_time(distance_matrix, Q, vmax, vmin, cities_items_dict))
+# # test solution
+# cities_items_dict = generate_cities_and_items_random(dataset, item_section)
+# print(calculate_total_time(distance_matrix, Q, vmax, vmin, cities_items_dict))
 
 # generate solutions
 N = 100 # population size
@@ -63,6 +64,7 @@ winner2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
 # mutation
 
+fake_children = [generate_cities_and_items_random(dataset, item_section) for i in range(2)]
 # evaluate the children
 fake_costs[N:] = np.random.normal(3, 2.5, size=(2, 2)) # replace with actual costs of the children
 
@@ -78,8 +80,22 @@ print(idx)
 
 # i don't think it's the most brilliant idea to concat lists of solutions.
 # instead, i'll see what the largest 2 numbers are and if they are larger than N, they are the children.
-print(heapq.nlargest(2, idx))
+# print(heapq.nlargest(2, idx))
+# or just see if the children are in there
+child_idx = []
+if 100 in idx:
+    child_idx.append(0)
+    idx.remove(100)
+if 101 in idx:
+    child_idx.append(1)
+    idx.remove(101)
 
+
+new_pop = [population[q] for q in idx] + [fake_children[q] for q in child_idx]
+
+print(new_pop)
+print(f"len of new pop: {len(new_pop)}")
+print("Amazing! we've made a new population!")
 
 # repeat until terminating condition
 
