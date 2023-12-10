@@ -30,8 +30,8 @@ node_coord_section = node_coord_section(dataset)
 distance_matrix = make_distance_matrix(node_coord_section)
 
 # # test solution
-# cities_items_dict, total_profit = generate_cities_and_items_random(dataset, item_section)
-# print(calculate_total_time(distance_matrix, Q, vmax, vmin, cities_items_dict))
+# cities_items_dict, city_travel, total_profit = generate_cities_and_items_random(dataset, item_section)
+# print(calculate_total_time(distance_matrix, Q, vmax, vmin, city_travel))
 
 # generate solutions
 N = 100 # population size
