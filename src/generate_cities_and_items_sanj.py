@@ -1,7 +1,8 @@
 import numpy as np
 
+from calculate_total_time_file import calculate_total_time
 
-def generate_cities_and_items_random(dataset, item_section):
+def generate_cities_and_items_random(dataset, item_section, D, vmax, vmin, R):
     """
   This function generates and returns a random order in which cities are to be traversed,
   along with a binary array that decides which items must be put in the knapsack
@@ -12,6 +13,12 @@ def generate_cities_and_items_random(dataset, item_section):
     Parsed data.
   item_section : 2D numpy array
     A reconstruction of the item section from the parsed data.
+  D : 2D numpy array
+    Distance matrix calculated by make_distance_matrix().
+  vmax, vmin : floats
+    Max and min velocities of the thief.
+  R : float
+    Renting ratio.
 
   Returns
   -------
@@ -24,12 +31,16 @@ def generate_cities_and_items_random(dataset, item_section):
                         city3_index: [(item1_index, item1_wt)...and so on...]}
 
   city_travel : 1D numpy array
-    The order in which cities should be visited
-
-  total_profit : int
-    The final profit of the knapsack which is the addition of all the profits of each of the items
+    The order in which cities should be visited.
+  net_profit : float
+    The final profit of the knapsack which is the addition of all the profits of each of the items minus the rent.
+  total_time : float
+    The total time to travel.
 
   """
+    # Validate the input parameters
+    if vmax <= 0 or vmin <= 0 or vmax < vmin:
+        raise ValueError("Invalid velocities: vmax and vmin must be positive, and vmax must be greater than vmin.")
 
     # reading the required qualities
     Q = dataset.knapsack_capacity
@@ -57,7 +68,16 @@ def generate_cities_and_items_random(dataset, item_section):
       for item in item_section[:, 0]:
         if items_select[int(item-1)] == 1 and item_section[int(item-1), 3] == city:
           cities_items_dict[city].append((item, item_section[int(item-1), 2]))
+
     total_profit = sum(items_select*item_section[:, 1])
-    return cities_items_dict, city_travel, total_profit
+
+    # calculating costs
+    # first, the time
+    total_time = calculate_total_time(D, Q, vmax, vmin, cities_items_dict, city_travel)
+
+    # now the net profit
+    net_profit = total_profit - (total_time * R)
+
+    return cities_items_dict, city_travel, net_profit, total_time
 
 

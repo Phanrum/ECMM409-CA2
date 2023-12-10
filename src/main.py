@@ -21,6 +21,7 @@ number_of_cities = dataset.dimension
 vmin = dataset.min_speed
 vmax = dataset.max_speed
 Q = dataset.knapsack_capacity
+R = dataset.renting_ratio
 
 # sections (from data)
 item_section = item_section(dataset)
@@ -30,12 +31,14 @@ node_coord_section = node_coord_section(dataset)
 distance_matrix = make_distance_matrix(node_coord_section)
 
 # # test solution
-# cities_items_dict, city_travel, total_profit = generate_cities_and_items_random(dataset, item_section)
+cities_items_dict, city_travel, net_profit, total_time = generate_cities_and_items_random(dataset, item_section, distance_matrix, vmax, vmin, R)
 # print(calculate_total_time(distance_matrix, Q, vmax, vmin, cities_items_dict, city_travel))
 
 # generate solutions
 N = 100 # population size
-population = [generate_cities_and_items_random(dataset, item_section) for i in range(N)]
+population = [generate_cities_and_items_random(dataset, item_section, distance_matrix, vmax, vmin, R) for i in range(N)]
+
+print(population[0])
 
 assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
 
