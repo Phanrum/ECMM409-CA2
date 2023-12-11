@@ -139,3 +139,7 @@ for i in trange(iterations):
 
 logging.info("the costs of this final population are:")
 plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")
+
+# Alex - save the results
+# make one file with final costs
+# and one file with solutions
