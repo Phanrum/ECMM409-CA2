@@ -9,10 +9,10 @@ def crossover_basic(first_parent, second_parent):
     return child1, child2
 
 
-def fix_tsp_crossover(cities_indices, child):
+def fix_tsp_crossover(parent, child):
     missing_cities = []
 
-    for index in cities_indices:
+    for index in parent:
         if index not in child:
             missing_cities.append(index)
 
@@ -55,20 +55,17 @@ def fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2):
     return child1, child2
 
 
-def crossover_tsp(cities_indices, path1, path2):
+def crossover_tsp(path1, path2):
     """
-    cities_indices: an array containing the index of every city
     path1: first parent for crossover
     path2: second parent for crossover
 
     returns two children
     """
 
-    crossover_point = random.choice(path1)
-
     child1, child2 = crossover_basic(path1, path2)
 
-    return fix_tsp_crossover(cities_indices, child1), fix_tsp_crossover(cities_indices, child2)
+    return fix_tsp_crossover(path1, child1), fix_tsp_crossover(path2, child2)
 
 
 def crossover_kp(items, knapsack1, knapsack2, max_weight):
