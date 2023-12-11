@@ -61,7 +61,7 @@ def packing_list_mutation(current_packing_list, item_section, Q):
 
 
         ####### use current_packing_list to create a new mutated list
-        mutated_list = ########### this variable will contain your mutated packing list
+        # mutated_list = ########### this variable will contain your mutated packing list
 
 
 

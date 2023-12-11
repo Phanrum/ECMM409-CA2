@@ -9,7 +9,7 @@ sys.path.append('../src')
 from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random, turn_binary_to_dictionary_and_calc_cost
-from calculate_total_time_file import calculate_total_time
+from crossover import crossover_tsp
 from pareto import calc_rank_and_crowding_distance, nsga_2_replacement_function, tour_select, plot_pareto
 
 # dev
@@ -62,7 +62,7 @@ fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=
 
 #### here is where the main loop starts
 # assume stopping criterion is number of iterations
-iterations = 50
+iterations = 20
 tour_size = 10
 
 for i in trange(iterations):
@@ -71,13 +71,20 @@ for i in trange(iterations):
 
     logging.debug("tournament selection")
     logging.debug(f"We must choose solution number {tour_select(tour_size, N, fake_costs_extended)}.")
-    winner1 = population[tour_select(tour_size, N, fake_costs_extended)]
+    win_tour_1, win_packing_1 = population[tour_select(tour_size, N, fake_costs_extended)]
     logging.debug(f"The second winner is solution number {tour_select(tour_size, N, fake_costs_extended)}.")
-    winner2 = population[tour_select(tour_size, N, fake_costs_extended)]
+    win_tour_2, win_packing_2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
     # crossover
 
+
     # mutation
+
+    child_tour_1, child_tour_2 = crossover_tsp(win_tour_1, win_tour_2)
+    fake_children = [
+        ()
+    ]
+
 
     # replace this with mutated individuals
     fake_children = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(2)]
@@ -118,7 +125,7 @@ for i in trange(iterations):
     fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for
                       c, i in population]
     # to the evaluations, append front ranks and crowding distance
-    fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])  # , plot=True)
+    fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True)
 
     # repeat until terminating condition
 

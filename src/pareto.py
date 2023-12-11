@@ -423,20 +423,4 @@ def tour_select(tour_size, N, costs):
     return int(shortlist[winner][-1])
 
 
-# # make a random array to test this on
-N = 250
-
-R = np.zeros((2 * N, 2))  # initialise an array for children and parents
-R[:N] = np.random.normal(3, 2.5, size=(N, 2))  # the first two columns are times and profits
-R[N:] = np.random.normal(3, 2.5, size=(N, 2))  # pretend these are children
-# sick. now the main loop.
-
-# assign ranks and distances
-costs, fronts = calc_rank_and_crowding_distance(R)  # , plot=True)
-solutions_to_carry = nsga_2_replacement_function(N, costs, fronts)
-
-# tournament selection!
-tour_size = 10
-# take random 10
-
 
