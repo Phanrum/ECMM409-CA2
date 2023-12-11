@@ -35,8 +35,9 @@ def is_over_weight(item_weight, child, max_weight):
     
     calculated_weight: int = 0
 
-    for city in child:
-        calculated_weight += item_weight[city]
+    for (i,city) in enumerate(child):
+        if city == 1:
+            calculated_weight += item_weight[i]
 
     if calculated_weight < max_weight:
         return False
