@@ -25,13 +25,13 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 20
+iterations_total = 200
 tour_size = 10
+data_name = "../data/a280-n279.txt"
 #######
 
-
 # read data
-dataset = Dataset.new(open("../data/a280-n279.txt", 'r').read())
+dataset = Dataset.new(open(data_name, 'r').read())
 print(dataset.name)
 
 # basic info from data
