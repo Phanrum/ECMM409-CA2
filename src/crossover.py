@@ -9,10 +9,10 @@ def crossover_basic(first_parent, second_parent):
     return child1, child2
 
 
-def fix_tsp_crossover(cities_indices, child):
+def fix_tsp_crossover(parent, child):
     missing_cities = []
 
-    for index in cities_indices:
+    for index in parent:
         if index not in child:
             missing_cities.append(index)
 
@@ -66,7 +66,9 @@ def crossover_tsp(path1, path2):
 
     child1, child2 = crossover_basic(path1, path2)
 
+
     return fix_tsp_crossover(path1, child1), fix_tsp_crossover(path1, child2)
+
 
 
 def crossover_kp(items, knapsack1, knapsack2, max_weight):
