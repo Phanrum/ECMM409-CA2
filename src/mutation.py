@@ -4,7 +4,7 @@ def single_swap_mutation_tsp(child):
     return child
 def bit_flip_mutation_kp(child):
     mutation_index= np.random.choice(len(child), 1, replace=False)
-    mutated_vector[idx] = 1 - mutated_vector[mutation_index]
+    child[idx] = 1 - child[mutation_index]
     return child
 
 # def multiple_swap_mutation(child, no_swaps):
@@ -58,8 +58,7 @@ def tsp_mutation(child):
     returns mutated child
     """
 
-    child1 = single_swap_mutation(child)
-
+    child1= single_swap_mutation_tsp(child)
 
     return child1
 
