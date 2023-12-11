@@ -9,7 +9,7 @@ sys.path.append('../src')
 from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random, turn_binary_to_dictionary_and_calc_cost
-from crossover import crossover_tsp
+from crossover import crossover_tsp, crossover_kp_but_make_it_indian
 from pareto import calc_rank_and_crowding_distance, nsga_2_replacement_function, tour_select, plot_pareto
 
 # dev
@@ -43,6 +43,8 @@ city_travel, items_select = generate_cities_and_items_random(Q, number_of_cities
 
 # generate solutions
 N = 100 # population size
+iterations = 1000
+tour_size = 10
 
 population = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(N)]
 
@@ -62,8 +64,7 @@ fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=
 
 #### here is where the main loop starts
 # assume stopping criterion is number of iterations
-iterations = 20
-tour_size = 10
+
 
 for i in trange(iterations):
 
@@ -76,18 +77,14 @@ for i in trange(iterations):
     win_tour_2, win_packing_2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
     # crossover
-
+    child_tour_1, child_tour_2 = crossover_tsp(win_tour_1, win_tour_2)
+    child_packing_1, child_packing_2 = crossover_kp_but_make_it_indian(win_packing_1, win_packing_2,  item_section, Q)
+    fake_children = [(child_tour_1, child_packing_1), (child_tour_2, child_packing_2)]
 
     # mutation
 
-    child_tour_1, child_tour_2 = crossover_tsp(win_tour_1, win_tour_2)
-    fake_children = [
-        ()
-    ]
 
 
-    # replace this with mutated individuals
-    fake_children = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(2)]
     # evaluate the children by calling
     fake_costs[N:] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in fake_children]
 

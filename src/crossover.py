@@ -1,10 +1,11 @@
 import random
+import numpy as np
 
 def crossover_basic(first_parent, second_parent):
     crossover_point = random.choice(first_parent)
 
-    child1 = first_parent[:crossover_point] + second_parent[crossover_point:]
-    child2 = second_parent[:crossover_point] + first_parent[crossover_point:]
+    child1 = np.concatenate((first_parent[:crossover_point], second_parent[crossover_point:]))
+    child2 = np.concatenate((second_parent[:crossover_point], first_parent[crossover_point:]))
 
     return child1, child2
 
@@ -22,7 +23,7 @@ def fix_tsp_crossover(parent, child):
         for (i, x) in enumerate(child):
             for (j, y) in enumerate(child):
                 if x == y and i < j:
-                    duplicate_cities.append[i]
+                    duplicate_cities.append(i)
      
     duplicates = list(zip(duplicate_cities, missing_cities))
 
@@ -85,3 +86,40 @@ def crossover_kp(items, knapsack1, knapsack2, max_weight):
     child1, child2 = fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2)
 
     return child1, child2
+
+def crossover_kp_but_make_it_indian(knapsack1, knapsack2,  item_section, Q):
+    """
+    Performs a crossover on two packing lists.
+
+    Parameters
+    ----------
+    knapsack1, knapsack2 : list[binary]
+        A binary list determining which items to pick up.
+    item_section : 2D numpy array
+        A reconstruction of the item section from the parsed data.
+    Q : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    child_knapsack_1, child_knapsack_2 : list[binary]
+        Crossovered (crossed-over?) packing list.
+    """
+
+    weight_array = item_section[:,2]
+    not_a_good_list = True
+    child_knapsack_1, child_knapsack_2 = None, None  # initiate packing lists
+
+    while not_a_good_list:
+        ### I have no clue what this will do but like hasta la vista baby??????
+        # I mean it's an evolution, it's not meant to make a huge amount of sense. right?
+
+        child_knapsack_1, child_knapsack_2 = crossover_basic(knapsack1, knapsack2)
+
+
+        w1 = sum(weight_array * child_knapsack_1)
+        w2 = sum(weight_array * child_knapsack_2)
+        if w1 <= Q and w2 <= Q: not_a_good_list = False
+        # the while loop keeps on generating packing lists until the knapsack condition is not violated
+
+    return child_knapsack_1, child_knapsack_2
