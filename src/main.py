@@ -77,26 +77,19 @@ for i in trange(iterations):
     win_tour_2, win_packing_2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
 
-    # wait i have another idea
-    # first, i think we should mutate by swapping cities. at the same positions as the swapped cities, we do bit flips.
-    # issue here is they might end up the same but it might not matter.
-    # then do the xo.
-
-    # crossing over cities and knapsacks independently makes no sense unless they are crossed in the same way
-    # we already know that the current packing list regardless of city plan wont violate knapsack weight
-    # so i think we should keep the dictionary, cross over the cities, fix the crossover
-    # then look up which items were to be packed in each city and make a binary array based on that
 
     # crossover
     child_tour_1, child_tour_2 = crossover_tsp(win_tour_1, win_tour_2)
     child_packing_1, child_packing_2 = crossover_kp_but_make_it_indian(win_packing_1, win_packing_2,  item_section, Q)
-    fake_children = [(child_tour_1, child_packing_1), (child_tour_2, child_packing_2)]
 
     # mutation
 
 
 
-    # evaluate the children by calling
+
+
+    # evaluate the children
+    fake_children = [(child_tour_1, child_packing_1), (child_tour_2, child_packing_2)]
     fake_costs[N:] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in fake_children]
 
     ## perform nsga-ii selection and replacement
@@ -136,6 +129,8 @@ for i in trange(iterations):
     fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True)
 
     # repeat until terminating condition
+
+
 
 logging.info("the costs of this final population are:")
 plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")

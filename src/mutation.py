@@ -53,13 +53,12 @@ def fix_kp_mutation(items,max_weight, knapsack):
 def tsp_mutation(child):
     """
 
-   
     child: first child for mutation
 
     returns mutated child
     """
 
-    child1= single_swap_mutation(child)
+    child1 = single_swap_mutation(child)
 
 
     return child1

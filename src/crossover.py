@@ -10,6 +10,7 @@ def crossover_basic(first_parent, second_parent):
     return child1, child2
 
 
+
 def fix_tsp_crossover(parent, child):
     missing_cities = []
 
@@ -111,11 +112,8 @@ def crossover_kp_but_make_it_indian(knapsack1, knapsack2,  item_section, Q):
     child_knapsack_1, child_knapsack_2 = None, None  # initiate packing lists
 
     while not_a_good_list:
-        ### I have no clue what this will do but like hasta la vista baby??????
-        # I mean it's an evolution, it's not meant to make a huge amount of sense. right?
 
         child_knapsack_1, child_knapsack_2 = crossover_basic(knapsack1, knapsack2)
-
 
         w1 = sum(weight_array * child_knapsack_1)
         w2 = sum(weight_array * child_knapsack_2)
