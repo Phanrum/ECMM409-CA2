@@ -1,6 +1,9 @@
 import numpy as np
 from tqdm import trange
 import logging
+import datetime
+import os
+import pickle
 
 # import our own modules
 import sys
@@ -10,6 +13,7 @@ from parsing import Dataset, item_section, node_coord_section
 from ttp import make_distance_matrix
 from generate_cities_and_items_sanj import generate_cities_and_items_random, turn_binary_to_dictionary_and_calc_cost
 from crossover import crossover_tsp, crossover_kp_but_make_it_indian
+from mutation import tsp_mutation, kp_mutation
 from pareto import calc_rank_and_crowding_distance, nsga_2_replacement_function, tour_select, plot_pareto
 
 # dev
@@ -18,6 +22,13 @@ logging.basicConfig(
     level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
+
+#######
+N = 100 # population size
+iterations_total = 10
+tour_size = 10
+#######
+
 
 # read data
 dataset = Dataset.new(open("../data/a280-n279.txt", 'r').read())
@@ -38,33 +49,52 @@ node_coord_section = node_coord_section(dataset)
 # construct a distance matrix
 distance_matrix = make_distance_matrix(node_coord_section)
 
-# # test solution
-city_travel, items_select = generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section)
-
 # generate solutions
-N = 100 # population size
-iterations = 1000
-tour_size = 10
 
-population = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(N)]
+# if you want to read a file
+filename_population = str(input("If you want to resume a previous run, please input the pickled file name of the POPULATION; otherwise, press enter:"))
+filename_costs = str(input("If you want to resume a previous run, please input the pickled file name of the COSTS; otherwise, press enter:"))
 
-logging.info(population[0])
+# check validity of answers
+if filename_population == "" and filename_costs != "":
+    raise ValueError("I got the costs file but not the population file. Fuck you. Run the program again.")
+if filename_population != "" and filename_costs == "":
+    raise ValueError("I got the population file but not the costs file. Fuck you. Run the program again.")
 
-assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
+# read pickle if you want to
+if filename_population and filename_costs:
+
+    iterations_done = os.path.basename(filename_population).split("_")[1]
+
+    population = np.load(filename_population, allow_pickle=True)
+    with open(filename_costs, 'r') as f:
+        fake_costs_extended = pickle.load(filename_costs)
+
+    assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
+    assert iterations_done < iterations_total, "You've already done more iterations than you wanted to."
+
+    iterations = iterations_total - iterations_done
 
 
 
-# evaluate all parents
+# if no file is read
+if filename_population == "" and filename_costs == "":
+    print("ok we're not reading anything")
 
-fake_costs = np.zeros((N+2, 2)) # initialise an array for parents and children
-fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in population]
-# to the evaluations, append front ranks and crowding distance
-fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True) # costs are basically costs but updated
+    iterations = iterations_total
+    population = [generate_cities_and_items_random(Q, number_of_cities, city_indices, item_section) for i in range(N)]
 
 
-#### here is where the main loop starts
-# assume stopping criterion is number of iterations
+    assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
 
+    # evaluate all parents
+    fake_costs = np.zeros((N+2, 2)) # initialise an array for parents and children
+    fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in population]
+    # to the evaluations, append front ranks and crowding distance
+    fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True) # costs are basically costs but updated
+
+
+#### main loop
 
 for i in trange(iterations):
 
@@ -83,10 +113,8 @@ for i in trange(iterations):
     child_packing_1, child_packing_2 = crossover_kp_but_make_it_indian(win_packing_1, win_packing_2,  item_section, Q)
 
     # mutation
-
-
-
-
+    # child_tour_1, child_tour_2 = tsp_mutation(child_tour_1, child_tour_2)
+    # child_packing_1, child_packing_2 = kp_mutation(item_section, child_packing_1, child_packing_2, Q)
 
     # evaluate the children
     fake_children = [(child_tour_1, child_packing_1), (child_tour_2, child_packing_2)]
@@ -134,6 +162,16 @@ for i in trange(iterations):
 
 logging.info("the costs of this final population are:")
 plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")
+
+# pause
+# save the population and fake_costs_extended
+stamp = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+
+np.save(f"cache/{dataset.name}_{iterations_total}_iter_costs_{stamp}.npy", fake_costs_extended)
+
+with open(f"cache/{dataset.name}_{iterations_total}_iter_population_{stamp}.pkl", 'wb') as f:
+    pickle.dump(population, f)
+f.close()
 
 # Alex - save the results
 # make one file with final costs

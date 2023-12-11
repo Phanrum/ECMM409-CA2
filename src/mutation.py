@@ -1,10 +1,12 @@
+import numpy as np
+
 def single_swap_mutation_tsp(child):
     mutation_index_1, mutation_index_2 = np.random.choice(len(child), 2, replace=False)
     child[mutation_index_1], child[mutation_index_2] = child[mutation_index_2], child[mutation_index_1]
     return child
 def bit_flip_mutation_kp(child):
     mutation_index= np.random.choice(len(child), 1, replace=False)
-    child[idx] = 1 - child[mutation_index]
+    child[mutation_index] = 1 - child[mutation_index]
     return child
 
 # def multiple_swap_mutation(child, no_swaps):
@@ -42,7 +44,8 @@ def is_over_weight(item_weight, child, max_weight):
 
 
 
-def fix_kp_mutation(items,max_weight, knapsack):
+def fix_kp_mutation(items, max_weight, knapsack):
+
     item_weight = [items[i].weight for i in range(len(items))]  # item weights
 
     while is_over_weight(item_weight, child1, max_weight):
@@ -50,7 +53,7 @@ def fix_kp_mutation(items,max_weight, knapsack):
 
     return child1
 
-def tsp_mutation(child):
+def tsp_mutation(tsp_parent_1, tsp_parent_2):
     """
 
     child: first child for mutation
@@ -58,13 +61,45 @@ def tsp_mutation(child):
     returns mutated child
     """
 
-    child1= single_swap_mutation_tsp(child)
+    child1 = single_swap_mutation_tsp(tsp_parent_1)
+    child2 = single_swap_mutation_tsp(tsp_parent_2)
 
-    return child1
+    return child1, child2
 
-def kp_mutation(items,knapsack,max_weight):
-    child1=bit_flip_mutation_kp(knapsack)
-    return fix_kp_mutation(items, child1, max_weight, knapsack)
+def kp_mutation(item_section, knapsack1, knapsack2, Q):
+    """
+    Performs a bit flip mutation on two packing lists.
+
+    Parameters
+    ----------
+    knapsack1, knapsack2 : list[binary]
+        A binary list determining which items to pick up.
+    item_section : 2D numpy array
+        A reconstruction of the item section from the parsed data.
+    Q : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    child_knapsack_1, child_knapsack_2 : list[binary]
+        Mutated packing lists.
+    """
+
+
+    weight_array = item_section[:,2]
+
+    not_a_good_list = True
+
+    while not_a_good_list:
+
+        child_knapsack_1, child_knapsack_2 = bit_flip_mutation_kp(knapsack1), bit_flip_mutation_kp(knapsack2)
+
+        w1 = sum(weight_array * child_knapsack_1)
+        w2 = sum(weight_array * child_knapsack_2)
+        if w1 <= Q and w2 <= Q: not_a_good_list = False
+        # the while loop keeps on generating packing lists until the knapsack condition is not violated
+
+    return child_knapsack_1, child_knapsack_2
 
     
     
