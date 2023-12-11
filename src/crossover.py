@@ -80,10 +80,8 @@ def crossover_kp(items, knapsack1, knapsack2, max_weight):
 
     returns two children
     """
-
-    crossover_point = random.choice(knapsack1)
     child1, child2 = crossover_basic(knapsack1, knapsack2)
 
-    child1, child2 = fix_kp_crossover(child1, child2, knapsack1, knapsack2)
+    child1, child2 = fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2)
 
     return child1, child2
