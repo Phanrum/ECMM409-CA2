@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 200
+iterations_total = 100
 tour_size = 10
-data_name = "../data/a280-n279.txt"
+data_name = "../data/a280-n1395.txt"
 #######
 
 # read data
