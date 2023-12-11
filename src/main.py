@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 100
+iterations_total = 200
 tour_size = 10
 data_name = "../data/a280-n1395.txt"
 #######
@@ -167,9 +167,9 @@ plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")
 # save the population and fake_costs_extended
 stamp = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
-np.save(f"cache/{dataset.name}_{iterations_total}_iter_costs_{stamp}.npy", fake_costs_extended)
+np.save(f"cache/{dataset.name}_{dataset.number_items}_{iterations_total}_iter_costs_{stamp}.npy", fake_costs_extended)
 
-with open(f"cache/{dataset.name}_{iterations_total}_iter_population_{stamp}.pkl", 'wb') as f:
+with open(f"cache/{dataset.name}_{dataset.number_items}_{iterations_total}_iter_population_{stamp}.pkl", 'wb') as f:
     pickle.dump(population, f)
 f.close()
 
