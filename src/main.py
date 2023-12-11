@@ -76,6 +76,17 @@ for i in trange(iterations):
     logging.debug(f"The second winner is solution number {tour_select(tour_size, N, fake_costs_extended)}.")
     win_tour_2, win_packing_2 = population[tour_select(tour_size, N, fake_costs_extended)]
 
+
+    # wait i have another idea
+    # first, i think we should mutate by swapping cities. at the same positions as the swapped cities, we do bit flips.
+    # issue here is they might end up the same but it might not matter.
+    # then do the xo.
+
+    # crossing over cities and knapsacks independently makes no sense unless they are crossed in the same way
+    # we already know that the current packing list regardless of city plan wont violate knapsack weight
+    # so i think we should keep the dictionary, cross over the cities, fix the crossover
+    # then look up which items were to be packed in each city and make a binary array based on that
+
     # crossover
     child_tour_1, child_tour_2 = crossover_tsp(win_tour_1, win_tour_2)
     child_packing_1, child_packing_2 = crossover_kp_but_make_it_indian(win_packing_1, win_packing_2,  item_section, Q)
