@@ -6,7 +6,7 @@ def single_swap_mutation_tsp(child):
     return child
 def bit_flip_mutation_kp(child):
     one_indices = np.where(child == 1)[0]
-    zero_indices = np.where(my_array == 0)[0]
+    zero_indices = np.where(child == 0)[0]
     random_index_one = np.random.choice(one_indices, 1)
     random_index_zero = np.random.choice(zero_indices, 1)
     child[random_index_one[0]] = 1 - child[random_index_one[0]]
