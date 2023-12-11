@@ -65,7 +65,7 @@ if filename_population != "" and filename_costs == "":
 # read pickle if you want to
 if filename_population and filename_costs:
 
-    iterations_done = int(os.path.basename(filename_population).split("_")[1])
+    iterations_done = int(os.path.basename(filename_population).split("_")[2])
 
     fake_costs_extended = np.load(filename_costs)
     with open(filename_population, 'rb') as f:
