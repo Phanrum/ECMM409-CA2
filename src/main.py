@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 10
+iterations_total = 20
 tour_size = 10
 #######
 
@@ -49,7 +49,8 @@ node_coord_section = node_coord_section(dataset)
 # construct a distance matrix
 distance_matrix = make_distance_matrix(node_coord_section)
 
-# generate solutions
+# generate solutions - initialise array for costs
+fake_costs = np.zeros((N + 2, 2))  # initialise an array for parents and children
 
 # if you want to read a file
 filename_population = str(input("If you want to resume a previous run, please input the pickled file name of the POPULATION; otherwise, press enter:"))
@@ -64,11 +65,11 @@ if filename_population != "" and filename_costs == "":
 # read pickle if you want to
 if filename_population and filename_costs:
 
-    iterations_done = os.path.basename(filename_population).split("_")[1]
+    iterations_done = int(os.path.basename(filename_population).split("_")[1])
 
-    population = np.load(filename_population, allow_pickle=True)
-    with open(filename_costs, 'r') as f:
-        fake_costs_extended = pickle.load(filename_costs)
+    fake_costs_extended = np.load(filename_costs)
+    with open(filename_population, 'rb') as f:
+        population = pickle.load(f)
 
     assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
     assert iterations_done < iterations_total, "You've already done more iterations than you wanted to."
@@ -88,7 +89,6 @@ if filename_population == "" and filename_costs == "":
     assert len(population) == N, f"Wait, but the number of parents ({len(population)}) is different to the population size ({N})."
 
     # evaluate all parents
-    fake_costs = np.zeros((N+2, 2)) # initialise an array for parents and children
     fake_costs[:N] = [turn_binary_to_dictionary_and_calc_cost(c, item_section, i, distance_matrix, Q, vmax, vmin, R) for c, i in population]
     # to the evaluations, append front ranks and crowding distance
     fake_costs_extended, _ = calc_rank_and_crowding_distance(fake_costs[:N])#, plot=True) # costs are basically costs but updated
@@ -113,8 +113,8 @@ for i in trange(iterations):
     child_packing_1, child_packing_2 = crossover_kp_but_make_it_indian(win_packing_1, win_packing_2,  item_section, Q)
 
     # mutation
-    # child_tour_1, child_tour_2 = tsp_mutation(child_tour_1, child_tour_2)
-    # child_packing_1, child_packing_2 = kp_mutation(item_section, child_packing_1, child_packing_2, Q)
+    child_tour_1, child_tour_2 = tsp_mutation(child_tour_1, child_tour_2)
+    child_packing_1, child_packing_2 = kp_mutation(item_section, child_packing_1, child_packing_2, Q)
 
     # evaluate the children
     fake_children = [(child_tour_1, child_packing_1), (child_tour_2, child_packing_2)]
