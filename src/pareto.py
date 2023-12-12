@@ -77,12 +77,14 @@ def pareto_parents(D):
 
 def plot_pareto(costs, label):
     """
-    Placeholder for the code which plots a pareto front
+    Placeholder for the code which plots a pareto front.
+
     Parameters
     ----------
     costs : 2D numpy array
         The first column will be plotted on the x axis, and the second on the y axis.
-    label : str The label displayed on the plot
+    label : str
+        The label displayed on the plot.
 
     Returns
     -------
@@ -189,11 +191,12 @@ NSGA-II"
 
 def plot_fronts(data, fronts):
     """
-    Make a pot of pareto fronts
+    Make a pot of pareto fronts.
+
     Parameters
     ----------
     data : 2D array
-        The data which will be plotted on the scatterplot
+        The data which will be plotted on the scatterplot.
     fronts : list [lists]
         A list of fronts. Each list contains integers which correspond to indices of data points.
 
@@ -228,7 +231,7 @@ def crowding_distance_assignment(I):
     Returns
     -------
     DistI : 1D array
-        Crowding distances for each solution
+        Crowding distances for each solution.
     """
 
     l = len(I)  # number of solutions in I
@@ -266,7 +269,7 @@ def crowded_comparison_operator(rank_i, rank_j, dist_i, dist_j):
 
     Returns
     -------
-    bool
+    True/False : Boolean Value
         Whether i is preferred over j.
     """
 
@@ -398,7 +401,7 @@ def tour_select(tour_size, N, costs):
     Returns
     -------
     winner : int
-        The index of the winning solution (taken from the last column)
+        The index of the winning solution (taken from the last column).
     """
 
     lucky_numbers = np.random.randint(N, size=tour_size)
