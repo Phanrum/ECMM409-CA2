@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 N = 100 # population size
 iterations_total = 200
 tour_size = 10
-data_name = "../data/a280-n1395.txt"
+data_name = "../data/a280-n2790.txt"
 #######
 
 # read data
@@ -173,6 +173,31 @@ with open(f"cache/{dataset.name}_n{dataset.number_items}_{iterations_total}_iter
     pickle.dump(population, f)
 f.close()
 
-# Alex - save the results
-# make one file with final costs
-# and one file with solutions
+######
+#Load cost and pop
+fake_costs_extended = np.load(filename_costs)
+with open(filename_population, 'rb') as f:
+    population = pickle.load(f)
+
+# create file called f"p_is_for_pomegranate_{dataset_name}.x"
+# Opens in append mode (if this file already exists - might be best to delete it first)
+xfile = open(f"p_is_for_pomegranate_{dataset.name}.x", "a")
+
+for (city_travel, items_select) in population:
+    xfile.write(f"{city_travel}")
+    xfile.write(f"{items_select}")
+    xfile.write("")
+
+xfile.close()
+
+# create file called f"p_is_for_pomegranate_{dataset_name}.f"
+# Opens in append mode (if this file already exists - might be best to delete it first)
+ffile = open("p_is_for_pomegranate_{dataset_name}.f", "a")
+#extract time and profit from fake_costs_extended
+time = fake_costs_extended[:, 0]
+profit = fake_costs_extended[:, 1]
+
+for (i,t) in enumerate(time):
+    ffile.write(f"{t} {profit[i]}")
+
+ffile.close()
