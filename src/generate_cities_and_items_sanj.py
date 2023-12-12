@@ -58,9 +58,11 @@ def turn_binary_to_dictionary_and_calc_cost(city_travel, item_section, items_sel
 
     Parameters
     ----------
-    city_travel : list[int]
+    city_travel : 1D numpy array
         An ordered list of cities to visit.
-    item_section : 1D numpy array
+    item_section : 2D numpy array
+        A 2D matrix derived from the section of the dataset which contains the details about the items available.
+    items_select : 1D numpy array
         A binary array of which items to take. Ordered the same way as it is in item_section.
     D : 2D numpy array
         Distance matrix.
