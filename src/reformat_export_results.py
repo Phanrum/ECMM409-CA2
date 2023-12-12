@@ -9,9 +9,9 @@ sys.path.append('../src')
 from parsing import Dataset
 
 # input desired data
-filename_costs = r"cache/fnl4461-TTP_n4460_20_iter_costs_2023-12-12 01-21-50.npy"
-filename_population = r"cache/fnl4461-TTP_n4460_20_iter_population_2023-12-12 01-21-50.pkl"
-data_name = "../data/fnl4461-n4460.txt"
+filename_costs = r"cache/a280-TTP_n1395_1200_iter_costs_2023-12-12 20-21-12.npy"
+filename_population = r"cache/a280-TTP_n1395_1200_iter_population_2023-12-12 20-21-12.pkl"
+data_name = "../data/a280-n1395.txt"
 
 
 #Load cost and pop
@@ -22,7 +22,7 @@ dataset = Dataset.new(open(data_name, 'r').read())
 iterations = int(os.path.basename(filename_population).split("_")[2])
 
 # create file called f"p_is_for_pomegranate_{dataset_name}.x"
-with open(f"../results/p_is_for_pomegranate_{dataset.name}-{dataset.dimension}_iter_{iterations}.x", "w") as xfile:
+with open(f"../results/p_is_for_pomegranate_{dataset.name}-n{dataset.number_items}_iter_{iterations}.x", "w") as xfile:
 
     for (city_travel, items_select) in population:
         xfile.write(f"{' '.join(str(e) for e in city_travel)}\n")
@@ -32,7 +32,7 @@ with open(f"../results/p_is_for_pomegranate_{dataset.name}-{dataset.dimension}_i
     xfile.close()
 
 # create file called f"p_is_for_pomegranate_{dataset_name}.f"
-with open(f"../results/p_is_for_pomegranate_{dataset.name}-n{dataset.dimension}_iter_{iterations}.f", "w") as ffile:
+with open(f"../results/p_is_for_pomegranate_{dataset.name}-n{dataset.number_items}_iter_{iterations}.f", "w") as ffile:
 
     #extract time and profit from fake_costs_extended
     time = fake_costs_extended[:, 0]

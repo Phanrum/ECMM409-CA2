@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 25
+iterations_total = 30
 tour_size = 10
 data_name = "../data/fnl4461-n4460.txt"
 #######

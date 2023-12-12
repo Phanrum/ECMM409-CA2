@@ -75,7 +75,7 @@ def pareto_parents(D):
     return pareto_front
 
 
-def plot_pareto(costs, label, show=False):
+def plot_pareto(costs, label, title="", single=True, show=False):
     """
     Placeholder for the code which plots a pareto front.
 
@@ -85,6 +85,10 @@ def plot_pareto(costs, label, show=False):
         The first column will be plotted on the x axis, and the second on the y axis.
     label : str
         The label displayed on the plot.
+    title : str (optional)
+        If you'd like to append anything to the title, do it here.
+    single : bool (default: True)
+        If False, adjusts the visualisation to make a plot with multiple lines clearer
     show : bool (default: False)
         If True, displays the plot.
 
@@ -97,11 +101,12 @@ def plot_pareto(costs, label, show=False):
     costs = np.sort(costs, axis=0)
 
     plt.plot(costs[:, 0], costs[:, 1], label=label)
-    plt.scatter(costs[:, 0], costs[:, 1], s=10, c="r")
+    if single:
+        plt.scatter(costs[:, 0], costs[:, 1], s=10, c="r")
     plt.legend(fontsize=13)
     plt.xlabel("Time", fontsize=15)
     plt.ylabel("Profit", fontsize=15)
-    plt.title("Pareto front of TTF solutions", size=17)
+    plt.title(f"Pareto front of TTF solutions {title}", size=17)
 
     if show:
 
