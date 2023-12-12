@@ -188,7 +188,7 @@ def crossover_kp_but_make_it_indian(knapsack1, knapsack2,  item_section, Q):
     Returns
     -------
     child_knapsack_1, child_knapsack_2 : 1D numpy array
-        Resulting packing list after the crossover has occuredd.
+        Resulting packing list after the crossover has occured.
     """
 
     weight_array = item_section[:,2]
