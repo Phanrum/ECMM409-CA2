@@ -2,6 +2,20 @@ import random
 import numpy as np
 
 def crossover_basic(first_parent, second_parent):
+    """
+    This function performs a crossover on 2 selected parents.
+
+    Parameters
+    ----------
+    first_parent, second_parent, knapsack2 : 1D numpy array
+        Parents selected for the crossover.
+
+    Returns
+    -------
+    child1, child2 : 1D numpy array
+        The resultant children generated through the crossover.
+    """
+
     crossover_point = random.choice(first_parent)
 
     child1 = np.concatenate((first_parent[:crossover_point], second_parent[crossover_point:]))
@@ -12,6 +26,22 @@ def crossover_basic(first_parent, second_parent):
 
 
 def fix_tsp_crossover(parent, child):
+    """
+    This function fixes the child generated while performing crossover for the city travel array.
+
+    Parameters
+    ----------
+    parent : 1D numpy array
+        One of the selected parent for the crossover.
+    child : 1D numpy array
+        Recently generated child.
+
+    Returns
+    -------
+    child : 1D numpy array
+        The resultant children generated after fixing the errors.
+    """
+
     missing_cities = []
 
     for index in parent:
@@ -34,6 +64,24 @@ def fix_tsp_crossover(parent, child):
     return child
     
 def is_over_weight(item_weight, child, max_weight):
+    """
+    This function checks whether the recently generated child violates the rule of knapsack or not.
+
+    Parameters
+    ----------
+    item_weight : 1D numpy array
+        An array containing the weights of all the items.
+    child : 1D numpy array
+        Recently generated child.
+    max_weight : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    True/False : Boolean Value
+        Returns whether the sum of all the selecetd items represented by the binary list
+        is less than or equal to the weight of the knapsack or not.
+    """
     
     calculated_weight: int = 0
 
@@ -49,6 +97,26 @@ def is_over_weight(item_weight, child, max_weight):
 
 
 def fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2):
+    """
+    This function performs a crossover on 2 binary arrays for knapsack.
+
+    Parameters
+    ----------
+    items : 1D numpy array
+        An array containing the items.
+    child1, child2 : 1D numpy array
+        Children who were generated through the crossover.
+    max_weight : float
+        Maximum capacity of the knapsack.
+    knapsack1, knapsack2 : 1D numpy array
+        Parents selected for the crossover.
+
+    Returns
+    -------
+    child1, child2 : 1D numpy array
+        The resultant children generated through the crossover.
+    """
+
     item_weight = [items[i].weight for i in range(len(items))]  # item weights
 
     while is_over_weight(item_weight, child1, max_weight) or is_over_weight(item_weight, child2, max_weight):
@@ -59,11 +127,17 @@ def fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2):
 
 def crossover_tsp(path1, path2):
     """
+    This function performs a crossover on 2 travel path lists.
 
-    path1: first parent for crossover
-    path2: second parent for crossover
+    Parameters
+    ----------
+    path1, path2 : 1D numpy array
+        Parents selected for the crossover.
 
-    returns two children
+    Returns
+    -------
+    fix_tsp_crossover(path1, child1), fix_tsp_crossover(path1, child2) : 1D numpy array
+        The resultant children generated through the crossover, after fixing them.
     """
 
     child1, child2 = crossover_basic(path1, path2)
@@ -75,13 +149,23 @@ def crossover_tsp(path1, path2):
 
 def crossover_kp(items, knapsack1, knapsack2, max_weight):
     """
-    items: an array containing the items
-    kanpsack1: first parent for crossover
-    knapsack2: second parent for crossover
-    max_weight: capacity of knapsack
+    This function performs a crossover on 2 binary arrays for the knapsack.
 
-    returns two children
+    Parameters
+    ----------
+    items : 1D numpy array
+        An array containing the items.
+    knapsack1, knapsack2 : 1D numpy array
+        Parents selected for the crossover.
+    max_weight : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    child1, child2 : 1D numpy array
+        The resultant binary arrays for the knapsack generated through the crossover.
     """
+
     child1, child2 = crossover_basic(knapsack1, knapsack2)
 
     child1, child2 = fix_kp_crossover(items, child1, child2, max_weight, knapsack1, knapsack2)
@@ -90,11 +174,11 @@ def crossover_kp(items, knapsack1, knapsack2, max_weight):
 
 def crossover_kp_but_make_it_indian(knapsack1, knapsack2,  item_section, Q):
     """
-    Performs a crossover on two packing lists.
+    This function performs a crossover on two packing lists.
 
     Parameters
     ----------
-    knapsack1, knapsack2 : list[binary]
+    knapsack1, knapsack2 : 1D numpy array
         A binary list determining which items to pick up.
     item_section : 2D numpy array
         A reconstruction of the item section from the parsed data.
@@ -103,8 +187,8 @@ def crossover_kp_but_make_it_indian(knapsack1, knapsack2,  item_section, Q):
 
     Returns
     -------
-    child_knapsack_1, child_knapsack_2 : list[binary]
-        Crossovered (crossed-over?) packing list.
+    child_knapsack_1, child_knapsack_2 : 1D numpy array
+        Resulting packing list after the crossover has occuredd.
     """
 
     weight_array = item_section[:,2]
