@@ -45,6 +45,22 @@ def bit_flip_mutation_kp(child):
     return child
 
 # def multiple_swap_mutation(child, no_swaps):
+#    """
+#    This function performs a multiple-swap mutation on a child.
+#
+#    Parameters
+#    ----------
+#    child : 1D numpy array
+#        Child which is to be mutated.
+#    no_swaps : int
+#        Number of swaps to be performed on the child.
+#
+#    Returns
+#    -------
+#    mutated_individual : 1D numpy array
+#        Child generated after performing the mutation.
+#    """
+#
 #     mutated_individual = child.copy()
 #
 #     # Choose distinct random positions to swap
