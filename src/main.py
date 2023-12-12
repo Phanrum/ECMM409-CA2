@@ -192,7 +192,7 @@ xfile.close()
 
 # create file called f"p_is_for_pomegranate_{dataset_name}.f"
 # Opens in append mode (if this file already exists - might be best to delete it first)
-ffile = open("p_is_for_pomegranate_{dataset.name}-n{dataset.dimension}.f", "a")
+ffile = open(f"p_is_for_pomegranate_{dataset.name}-n{dataset.dimension}.f", "a")
 #extract time and profit from fake_costs_extended
 time = fake_costs_extended[:, 0]
 profit = fake_costs_extended[:, 1]
