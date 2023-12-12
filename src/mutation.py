@@ -1,16 +1,47 @@
 import numpy as np
 
 def single_swap_mutation_tsp(child):
+    """
+    This function performs a single-swap mutation on a child.
+
+    Parameters
+    ----------
+    child : 1D numpy array
+        Child which is to be mutated.
+
+    Returns
+    -------
+    child : 1D numpy array
+        Child generated after performing the mutation.
+    """
+
     mutation_index_1, mutation_index_2 = np.random.choice(len(child), 2, replace=False)
     child[mutation_index_1], child[mutation_index_2] = child[mutation_index_2], child[mutation_index_1]
+
     return child
+
 def bit_flip_mutation_kp(child):
+    """
+    This function performs a bit-flip mutation on a child.
+
+    Parameters
+    ----------
+    child : 1D numpy array
+        Child which is to be mutated.
+
+    Returns
+    -------
+    child : 1D numpy array
+        Child generated after performing the mutation.
+    """
+
     one_indices = np.where(child == 1)[0]
     zero_indices = np.where(child == 0)[0]
     random_index_one = np.random.choice(one_indices, 1)
     random_index_zero = np.random.choice(zero_indices, 1)
     child[random_index_one[0]] = 1 - child[random_index_one[0]]
     child[random_index_zero[0]] = 1 - child[random_index_zero[0]]
+
     return child
 
 # def multiple_swap_mutation(child, no_swaps):
@@ -31,9 +62,25 @@ def bit_flip_mutation_kp(child):
 #
 #     return mutated_individual
 
-
-
 def is_over_weight(item_weight, child, max_weight):
+    """
+    This function checks whether the recently mutated child violates the rule of knapsack or not.
+
+    Parameters
+    ----------
+    item_weight : 1D numpy array
+        An array containing the weights of all the items.
+    child : 1D numpy array
+        Recently generated child.
+    max_weight : float
+        Maximum capacity of the knapsack.
+
+    Returns
+    -------
+    True/False : Boolean Value
+        Returns whether the sum of all the selecetd items represented by the binary list
+        is greater than the weight of the knapsack or not.
+    """
     
     calculated_weight: int = 0
 
@@ -49,6 +96,24 @@ def is_over_weight(item_weight, child, max_weight):
 
 
 def fix_kp_mutation(items, max_weight, knapsack):
+    """
+    This function fixes a recently generated knapsack child by performing a bit-flip mutation.
+    A child is to be fixed if it violates the rule of knapsack.
+
+    Parameters
+    ----------
+    items : An items object
+        An object representing an item.
+    max_weight : float
+        Maximum capacity of the knapsack.
+    knapsack : 1D numpy array
+        Recently generated child.
+
+    Returns
+    -------
+    child1 : 1D numpy array
+        Child generated after fixing the errors.
+    """
 
     item_weight = [items[i].weight for i in range(len(items))]  # item weights
 
@@ -59,10 +124,17 @@ def fix_kp_mutation(items, max_weight, knapsack):
 
 def tsp_mutation(tsp_parent_1, tsp_parent_2):
     """
+    This function accepts 2 city travel arrays and performs a single-swap mutation on both of them.
 
-    child: first child for mutation
+    Parameters
+    ----------
+    tsp_parent_1, tsp_parent_2 : 1D numpy array
+        Parents selected for the single-swap mutation.
 
-    returns mutated child
+    Returns
+    -------
+    child1, child2 : 1D numpy array
+        The resultant children generated after performing a single-swap mutation.
     """
 
     child1 = single_swap_mutation_tsp(tsp_parent_1)
@@ -76,16 +148,16 @@ def kp_mutation(item_section, knapsack1, knapsack2, Q):
 
     Parameters
     ----------
-    knapsack1, knapsack2 : list[binary]
-        A binary list determining which items to pick up.
     item_section : 2D numpy array
         A reconstruction of the item section from the parsed data.
+    knapsack1, knapsack2 : 1D numpy array
+        A binary list determining which items to pick up.
     Q : float
         Maximum capacity of the knapsack.
 
     Returns
     -------
-    child_knapsack_1, child_knapsack_2 : list[binary]
+    child_knapsack_1, child_knapsack_2 : 1D numpy array
         Mutated packing lists.
     """
 
