@@ -49,7 +49,7 @@ print("Matrix distance:", matrix_distance)
 print("Distance calculation correct:", np.isclose(manual_distance, matrix_distance))
 
 # Test TSP crossover
-parent1 = [1, 2, 3, 4, 5]  
+parent1 = [1, 2, 3, 4, 5]  #
 parent2 = [5, 4, 3, 2, 1]  
 child1, child2 = crossover_tsp(parent1, parent2)
 print("Child1 valid:", is_valid_tour(child1, len(parent1)))
