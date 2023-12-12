@@ -184,9 +184,9 @@ with open(filename_population, 'rb') as f:
 xfile = open(f"p_is_for_pomegranate_{dataset.name}-{dataset.dimension}.x", "a")
 
 for (city_travel, items_select) in population:
-    xfile.write(f"{city_travel}")
-    xfile.write(f"{items_select}")
-    xfile.write("")
+    xfile.write(f"{city_travel}\n")
+    xfile.write(f"{items_select}\n")
+    xfile.write("\n")
 
 xfile.close()
 
@@ -198,6 +198,6 @@ time = fake_costs_extended[:, 0]
 profit = fake_costs_extended[:, 1]
 
 for (i,t) in enumerate(time):
-    ffile.write(f"{t} {profit[i]}")
+    ffile.write(f"{t} {profit[i]}\n")
 
 ffile.close()
