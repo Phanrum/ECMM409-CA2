@@ -75,7 +75,7 @@ def pareto_parents(D):
     return pareto_front
 
 
-def plot_pareto(costs, label):
+def plot_pareto(costs, label, show=False):
     """
     Placeholder for the code which plots a pareto front.
 
@@ -85,6 +85,8 @@ def plot_pareto(costs, label):
         The first column will be plotted on the x axis, and the second on the y axis.
     label : str
         The label displayed on the plot.
+    show : bool (default: False)
+        If True, displays the plot.
 
     Returns
     -------
@@ -101,7 +103,9 @@ def plot_pareto(costs, label):
     plt.ylabel("Profit", fontsize=15)
     plt.title("Pareto front of TTF solutions", size=17)
 
-    plt.show()
+    if show:
+
+        plt.show()
 
 
 # ok basically
@@ -189,7 +193,7 @@ NSGA-II"
     return front
 
 
-def plot_fronts(data, fronts):
+def plot_fronts(data, fronts, show=False):
     """
     Make a pot of pareto fronts.
 
@@ -199,6 +203,8 @@ def plot_fronts(data, fronts):
         The data which will be plotted on the scatterplot.
     fronts : list [lists]
         A list of fronts. Each list contains integers which correspond to indices of data points.
+    show : bool (default: False)
+        If True, displays the plot.
 
     Returns
     -------
@@ -216,7 +222,8 @@ def plot_fronts(data, fronts):
 
         plt.plot(nth_front[:, 0], nth_front[:, 1])
 
-    plt.show()
+    if show:
+        plt.show()
 
 
 def crowding_distance_assignment(I):

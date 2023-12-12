@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 #######
 N = 100 # population size
-iterations_total = 200
+iterations_total = 25
 tour_size = 10
-data_name = "../data/a280-n2790.txt"
+data_name = "../data/fnl4461-n4460.txt"
 #######
 
 # read data
@@ -161,7 +161,7 @@ for i in trange(iterations):
 
 
 logging.info("the costs of this final population are:")
-plot_pareto(fake_costs[:-2], "NSGA-II Pareto front")
+plot_pareto(fake_costs[:-2], "NSGA-II Pareto front", show=True)
 
 # pause
 # save the population and fake_costs_extended
@@ -172,32 +172,3 @@ np.save(f"cache/{dataset.name}_n{dataset.number_items}_{iterations_total}_iter_c
 with open(f"cache/{dataset.name}_n{dataset.number_items}_{iterations_total}_iter_population_{stamp}.pkl", 'wb') as f:
     pickle.dump(population, f)
 f.close()
-
-######
-#Load cost and pop
-fake_costs_extended = np.load(filename_costs)
-with open(filename_population, 'rb') as f:
-    population = pickle.load(f)
-
-# create file called f"p_is_for_pomegranate_{dataset_name}.x"
-# Opens in append mode (if this file already exists - might be best to delete it first)
-xfile = open(f"p_is_for_pomegranate_{dataset.name}-{dataset.dimension}.x", "a")
-
-for (city_travel, items_select) in population:
-    xfile.write(f"{city_travel}\n")
-    xfile.write(f"{items_select}\n")
-    xfile.write("\n")
-
-xfile.close()
-
-# create file called f"p_is_for_pomegranate_{dataset_name}.f"
-# Opens in append mode (if this file already exists - might be best to delete it first)
-ffile = open(f"p_is_for_pomegranate_{dataset.name}-n{dataset.dimension}.f", "a")
-#extract time and profit from fake_costs_extended
-time = fake_costs_extended[:, 0]
-profit = fake_costs_extended[:, 1]
-
-for (i,t) in enumerate(time):
-    ffile.write(f"{t} {profit[i]}\n")
-
-ffile.close()
