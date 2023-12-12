@@ -3,7 +3,7 @@
 We present a program which tackles the Traveling Thief Problem by using a genetic algorithm (GA). It aims to optimise the travel plan and packing plan of the thief to maximise the profit he makes and minimise the time it takes him.
 The GA used here is the NSGA-II with the following operators.
 * Travel plan: Crossover with fix, Swap mutation
-* Packing plan: CROSSOVER?, Bit swap mutation(TBC)
+* Packing plan: Single point crossover, Bit swap mutation(TBC)
 
 Crucially, the thief pays rent for the knapsack, which is deducted from his gross profit.
 ## Instructions
