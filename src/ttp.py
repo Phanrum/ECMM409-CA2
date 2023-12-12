@@ -10,7 +10,7 @@ def make_distance_matrix(node_coord_section):
     Parameters
     ----------
     node_coord_section : 2D numpy array
-        Array of cities and their coordinates
+        Array of cities and their coordinates.
 
     Returns
     -------
