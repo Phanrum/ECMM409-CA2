@@ -80,7 +80,7 @@ def is_over_weight(item_weight, child, max_weight):
     -------
     True/False : Boolean Value
         Returns whether the sum of all the selecetd items represented by the binary list
-        is less than or equal to the weight of the knapsack or not.
+        is greater than the weight of the knapsack or not.
     """
     
     calculated_weight: int = 0
